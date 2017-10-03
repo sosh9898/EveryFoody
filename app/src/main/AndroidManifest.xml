@@ -26,7 +26,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.signup.owner.SignUpOwnerActivity" />
-        <activity android:name=".ui.signup.SignUpMainActivity"></activity>
+        <activity android:name=".ui.signup.SignUpMainActivity" />
+        <activity android:name=".ui.home.owner.OwnerHomeActivity" />
+        <activity android:name=".ui.home.owner.register.TruckRegisterActivity" />
+        <activity android:name=".ui.notification.NotifyActivity"></activity>
     </application>
 
 </manifest>

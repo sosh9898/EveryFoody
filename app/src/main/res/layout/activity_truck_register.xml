@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="dct.com.everyfoody.ui.home.owner.register.TruckRegisterActivity">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/truck_register_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"></android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_marginTop="33dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/textbox2"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:gravity="center_horizontal"
+            android:letterSpacing="-0.04"
+            android:lineSpacingExtra="6sp"
+            android:padding="10dp"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="가게 등록은 사업자등록증 확인 후 진행됩니다.\n또한 세부적인 가게정보 입력은 가게등록 후 가능합니다." />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:src="@drawable/foodtruck_2" />
+
+    <EditText
+        android:layout_width="293dp"
+        android:layout_height="39dp"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/edittext_base"
+        android:gravity="center_vertical"
+        android:hint="가게 이름"
+        android:paddingLeft="23dp"
+        android:textColor="@color/colorAccentText"
+        android:textColorHint="@color/colorAccentText"
+        android:textSize="14sp" />
+
+
+    <LinearLayout
+        android:layout_width="293dp"
+        android:layout_height="39dp"
+        android:layout_marginTop="13dp"
+        android:background="@drawable/edittext_base"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="23dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/camera" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="사업자등록증 첨부"
+            android:textColor="@color/colorAccentText"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
