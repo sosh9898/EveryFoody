@@ -29,7 +29,9 @@
         <activity android:name=".ui.signup.SignUpMainActivity" />
         <activity android:name=".ui.home.owner.OwnerHomeActivity" />
         <activity android:name=".ui.home.owner.register.TruckRegisterActivity" />
-        <activity android:name=".ui.notification.NotifyActivity"></activity>
+        <activity android:name=".ui.notification.NotifyActivity" />
+        <activity android:name=".ui.reservation.ReservationActivity" />
+        <activity android:name=".ui.home.owner.turn.TurnActivity"></activity>
     </application>
 
 </manifest>
