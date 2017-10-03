@@ -8,7 +8,6 @@
     android:background="@color/colorPrimaryDark"
     tools:context="dct.com.everyfoody.ui.notification.NotifyActivity">
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/notification_toolbar"
         android:layout_width="match_parent"

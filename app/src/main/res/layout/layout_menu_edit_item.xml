@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/menu_item_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="277dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/menu_item_image_container"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="@color/colorDefaultBackground">
+
+            <TextView
+                android:layout_marginTop="32dp"
+                android:id="@+id/menu_item_name"
+                android:layout_width="88dp"
+                android:layout_height="19dp"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:text="메뉴 사진"
+                android:textColor="@color/colorDefaultText"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_marginTop="6dp"
+                android:id="@+id/menu_item_image"
+                android:layout_width="59dp"
+                android:layout_height="59dp"
+                android:layout_below="@+id/menu_item_name"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/photo" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="293dp"
+            android:layout_height="39dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="19dp"
+            android:background="@drawable/edittext_base">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="23dp"
+                android:background="@null"
+                android:hint="메뉴이름"
+                android:textColorHint="@color/colorEditTextHint"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="293dp"
+            android:layout_height="39dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="19dp"
+            android:background="@drawable/edittext_base">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="23dp"
+                android:background="@null"
+                android:hint="메뉴가격"
+                android:textColorHint="@color/colorEditTextHint"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
