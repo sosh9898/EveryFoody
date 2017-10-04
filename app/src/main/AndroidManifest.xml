@@ -11,20 +11,21 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.splash.SplashActivity"
-            android:theme="@style/SplashTheme" />
-        <activity
-            android:name=".ui.home.user.MainActivity"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".ui.detail.DetailActivity" />
-        <activity android:name=".ui.signup.user.SignUpActivity" />
-        <activity android:name=".ui.login.LoginActivity">
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.home.user.MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".ui.detail.DetailActivity" />
+        <activity android:name=".ui.signup.user.SignUpActivity" />
+        <activity android:name=".ui.login.LoginActivity"></activity>
         <activity android:name=".ui.signup.owner.SignUpOwnerActivity" />
         <activity android:name=".ui.signup.SignUpMainActivity" />
         <activity android:name=".ui.home.owner.OwnerHomeActivity" />
