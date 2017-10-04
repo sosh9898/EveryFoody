@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/dimmed_view"
+        android:layout_width="match_parent"
+        android:layout_height="134dp"
+        android:background="@color/colorPrimaryDark" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/dimmed_view">
+
+        <TextView
+            android:id="@+id/plz_login_text"
+            tools:text="로그인해주세요"
+            android:layout_width="wrap_content"
+            android:layout_height="19dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="82dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/login_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/plz_login_text"
+            android:layout_marginTop="18dp">
+
+            <View
+                android:id="@+id/divider_line1"
+                android:layout_width="198dp"
+                android:layout_height="1dp"
+                android:layout_centerHorizontal="true"
+                android:background="@color/colorPrimaryDark" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="18dp"
+                android:layout_below="@id/divider_line1"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="13dp"
+                android:src="@drawable/login" />
+
+            <TextView
+                tools:text="로그인"
+                android:layout_width="wrap_content"
+                android:layout_height="17dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/divider_line1"
+                android:layout_marginRight="37dp"
+                android:layout_marginTop="14dp"
+                android:textColor="@color/colorAccent" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/signup_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_container"
+            android:layout_marginTop="18dp">
+
+            <View
+                android:id="@+id/divider_line2"
+                android:layout_width="198dp"
+                android:layout_height="1dp"
+                android:layout_centerHorizontal="true"
+                android:background="@color/colorPrimaryDark" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="18dp"
+                android:layout_below="@id/divider_line2"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="13dp"
+                android:src="@drawable/signup" />
+
+            <TextView
+                tools:text="회원가입"
+                android:layout_width="wrap_content"
+                android:layout_height="17dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/divider_line2"
+                android:layout_marginRight="37dp"
+                android:layout_marginTop="14dp"
+                android:textColor="@color/colorAccent" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
