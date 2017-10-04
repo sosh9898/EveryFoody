@@ -5,13 +5,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/dimmed_view"
-        android:layout_width="match_parent"
-        android:layout_height="134dp"
-        android:background="@color/colorPrimaryDark" />
 
     <RelativeLayout
+        android:layout_marginTop="134dp"
         android:id="@+id/user_default_info_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -137,5 +133,15 @@
 
     </RelativeLayout>
 
+
+    <ImageView
+        android:id="@+id/profile_edit_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="166dp"
+        android:layout_marginLeft="157dp"
+        android:src="@drawable/profile_edit"
+        android:visibility="visible"
+        />
 
 </RelativeLayout>

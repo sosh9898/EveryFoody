@@ -6,13 +6,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/dimmed_view"
-        android:layout_width="match_parent"
-        android:layout_height="134dp"
-        android:background="@color/colorPrimaryDark" />
+
 
     <RelativeLayout
+        android:layout_marginTop="134dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/dimmed_view">
