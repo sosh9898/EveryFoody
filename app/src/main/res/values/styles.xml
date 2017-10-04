@@ -27,5 +27,12 @@
         <item name="android:maxHeight">100dp</item>
     </style>
 
+    <!-- SwitchCompat style resource -->
+    <style name="pushSwitch" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="colorSwitchThumbNormal">@color/colorAccentText</item>
+    </style>
+
 
 </resources>

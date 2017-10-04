@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="248dp"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/drawer_default"
+        layout="@layout/layout_drawer_default"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        />
+
+    <include
+        android:id="@+id/drawer_logged"
+        layout="@layout/layout_drawer_logged_in"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="77dp"
+        android:background="@null"
+        app:civ_border_color="#26000000"
+        app:civ_border_width="2dp"
+        tools:src="@color/colorPrimary" />
+
+    <ImageView
+        android:id="@+id/profile_edit_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="166dp"
+        android:layout_marginLeft="157dp"
+        android:src="@drawable/profile_edit"
+        android:visibility="gone"
+        />
+</FrameLayout>
