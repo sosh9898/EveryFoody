@@ -62,10 +62,10 @@
                 android:background="@color/colorAccent"></FrameLayout>
 
             <RelativeLayout
-                android:layout_alignParentTop="true"
                 android:id="@+id/info_group"
                 android:layout_width="match_parent"
                 android:layout_height="37dp"
+                android:layout_alignParentTop="true"
                 android:layout_below="@+id/normal_divider"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal">
@@ -95,10 +95,10 @@
             </RelativeLayout>
 
             <FrameLayout
-                android:layout_above="@+id/booking_group"
                 android:id="@+id/detail_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_above="@+id/booking_group"
                 android:layout_below="@+id/info_group">
 
             </FrameLayout>
@@ -133,12 +133,10 @@
             </RelativeLayout>
 
 
-
         </RelativeLayout>
 
 
     </android.support.v4.widget.NestedScrollView>
-
 
 
 </android.support.design.widget.CoordinatorLayout>
