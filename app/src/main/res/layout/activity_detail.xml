@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".ui.detail.DetailActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -48,12 +47,14 @@
         android:id="@+id/detall_nested_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport = "true"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:id="@+id/normal_divider"
@@ -64,7 +65,7 @@
             <RelativeLayout
                 android:id="@+id/info_group"
                 android:layout_width="match_parent"
-                android:layout_height="37dp"
+                android:layout_height="40dp"
                 android:layout_alignParentTop="true"
                 android:layout_below="@+id/normal_divider"
                 android:gravity="center_horizontal"
@@ -73,8 +74,8 @@
                 <Button
                     android:id="@+id/normal_info_btn"
                     android:layout_width="wrap_content"
-                    android:layout_height="37dp"
-                    android:background="@drawable/normal_button"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/detail_info_selected"
                     android:paddingBottom="3dp"
                     android:text="기본정보"
                     android:textColor="@color/colorPrimary"
@@ -84,9 +85,9 @@
                 <Button
                     android:id="@+id/menu_info_btn"
                     android:layout_width="wrap_content"
-                    android:layout_height="34dp"
+                    android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/normal_info_btn"
-                    android:background="@drawable/menu_button"
+                    android:background="@drawable/detail_info_unselected"
                     android:text="메뉴정보"
                     android:textColor="@color/colorAccent"
                     android:textSize="14sp"
@@ -95,6 +96,7 @@
             </RelativeLayout>
 
             <FrameLayout
+                android:layout_marginTop="25dp"
                 android:id="@+id/detail_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
