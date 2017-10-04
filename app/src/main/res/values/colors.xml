@@ -4,4 +4,11 @@
     <color name="colorPrimaryDark">#f0f0f0</color>
     <color name="colorAccent">#ff6e00</color>
     <color name="colorAccentText">#848484</color>
+
+    <!-- owner_page_edit -->
+
+    <color name="colorDefaultText">#c4c4c4</color>
+    <color name="colorDefaultBackground">#ededed</color>
+    <color name="colorEditTextHint">#898989</color>
+
 </resources>
