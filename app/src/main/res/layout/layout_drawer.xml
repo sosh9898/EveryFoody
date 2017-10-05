@@ -3,13 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="248dp"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_gravity="start">
 
     <View
         android:id="@+id/dimmed_view"
         android:layout_width="match_parent"
         android:layout_height="134dp"
         android:background="@color/colorPrimaryDark" />
+
+
+    <include
+        android:id="@+id/drawer_default"
+        layout="@layout/layout_drawer_default"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+
+    <include
+        android:id="@+id/drawer_logged"
+        layout="@layout/layout_drawer_logged_in"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
@@ -21,20 +38,5 @@
         app:civ_border_color="#26000000"
         app:civ_border_width="2dp"
         tools:src="@color/colorPrimary" />
-
-    <include
-        android:id="@+id/drawer_default"
-        layout="@layout/layout_drawer_default"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <include
-        android:id="@+id/drawer_logged"
-        layout="@layout/layout_drawer_logged_in"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
-
 
 </FrameLayout>

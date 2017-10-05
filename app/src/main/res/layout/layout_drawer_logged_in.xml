@@ -7,6 +7,7 @@
 
 
     <RelativeLayout
+        android:background="@color/colorPrimary"
         android:layout_marginTop="134dp"
         android:id="@+id/user_default_info_container"
         android:layout_width="match_parent"
@@ -112,14 +113,6 @@
             android:layout_marginTop="10dp"
             android:background="@color/colorPrimaryDark" />
 
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/logout_btn"
-            android:layout_below="@id/divider_line2"
-            android:layout_marginTop="15dp"
-            tools:listitem="@layout/layout_push_list_rcv_item" />
-
         <Button
             android:id="@+id/logout_btn"
             android:layout_width="match_parent"
@@ -130,6 +123,16 @@
             android:textColor="@color/colorPrimary"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/logout_btn"
+            android:layout_below="@id/divider_line2"
+            android:layout_marginTop="15dp"
+            tools:listitem="@layout/layout_push_list_rcv_item" />
+
+
 
     </RelativeLayout>
 

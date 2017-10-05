@@ -11,4 +11,6 @@
     <color name="colorDefaultBackground">#ededed</color>
     <color name="colorEditTextHint">#898989</color>
 
+    <color name="colorComment">#ffe2cc</color>
+
 </resources>

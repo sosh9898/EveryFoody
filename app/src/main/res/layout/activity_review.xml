@@ -1,37 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".ui.guest.detail.review.ReviewActivity">
+    android:background="@color/colorPrimaryDark"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".ui.detail.review.ReviewActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/review_app_bar_layout"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/review_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/review_rcv"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="24dp"
+        tools:listitem="@layout/layout_review_rcv_item">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/comment_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorComment"
+        android:orientation="horizontal">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/review_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@color/colorPrimary">
+
+            <ImageView
+                android:layout_marginLeft="8dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/camera"/>
+
+            <EditText
+                android:id="@+id/comment_edit"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:paddingLeft="13dp"
+                android:paddingTop="6dp"
+                android:textSize="15sp" />
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/comment_register_image"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/comment_background"
+            android:text="등록"
+            android:textColor="#fff" />
 
 
-    </android.support.design.widget.AppBarLayout>
+    </LinearLayout>
 
 
-       <android.support.v7.widget.RecyclerView
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
-       </android.support.v7.widget.RecyclerView>
-
-
-
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

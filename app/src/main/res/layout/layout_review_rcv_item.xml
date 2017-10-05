@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="320dp"
+    android:layout_height="205dp"
+    android:layout_marginBottom="13dp"
+    android:background="@drawable/notification_background"
+    android:elevation="2dp">
 
     <TextView
         android:id="@+id/review_writer_name"
         android:layout_marginTop="19dp"
-        android:layout_marginLeft="47dp"
+        android:layout_marginLeft="20dp"
         android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="@color/colorAccentText"
@@ -19,7 +22,7 @@
         style="@style/customRatingBar"
         android:layout_alignTop="@+id/review_writer_name"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="46dp"
+        android:layout_marginRight="20dp"
         android:id="@+id/review_rating"
         android:layout_width="wrap_content"
         android:layout_height="15dp"
@@ -36,5 +39,13 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/review_rating"
         tools:text="친절하고 맛있어요"/>
+    
+    <ImageView
+        android:layout_marginTop="67dp"
+        android:layout_alignRight="@+id/review_rating"
+        android:layout_alignLeft="@+id/review_writer_name"
+        android:id="@+id/review_image"
+        android:layout_width="match_parent"
+        android:layout_height="110dp" />
 
 </RelativeLayout>
