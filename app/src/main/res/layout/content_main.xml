@@ -15,11 +15,13 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/map_clip_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary">
 
             <ImageView
+                android:tag="area1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="177dp"
@@ -27,6 +29,8 @@
                 android:src="@drawable/area1" />
 
             <TextView
+                android:tag="1"
+                android:id="@+id/area1_name"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginLeft="205dp"
@@ -36,6 +40,7 @@
                 android:textSize="10sp" />
 
             <ImageView
+                android:tag="area2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="200dp"
@@ -43,6 +48,8 @@
                 android:src="@drawable/area2" />
 
             <TextView
+                android:tag="2"
+                android:id="@+id/area2_name"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginLeft="216dp"
@@ -52,6 +59,7 @@
                 android:textSize="10sp" />
 
             <ImageView
+                android:tag="area7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="98dp"
@@ -59,16 +67,18 @@
                 android:src="@drawable/area7" />
 
             <TextView
+                android:tag="7"
+                android:id="@+id/area7_name"
                 android:layout_width="wrap_content"
                 android:layout_height="37dp"
                 android:layout_marginLeft="129dp"
                 android:layout_marginTop="96dp"
                 android:text=" 은평\n 마포\n서대문"
                 android:textColor="@color/colorAccent"
-                android:textSize="10sp"
-                android:id="@+id/textView2" />
+                android:textSize="10sp" />
 
             <ImageView
+                android:tag="area8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="153dp"
@@ -76,6 +86,8 @@
                 android:src="@drawable/area8_click" />
 
             <TextView
+                android:tag="8"
+                android:id="@+id/area8_name"
                 android:layout_width="wrap_content"
                 android:layout_height="37dp"
                 android:layout_marginLeft="172dp"
@@ -85,14 +97,17 @@
                 android:textSize="10sp" />
 
             <ImageView
+                android:tag="area6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/area6"
-                android:layout_alignBottom="@+id/textView"
-                android:layout_alignRight="@+id/textView2"
-                android:layout_alignEnd="@+id/textView2" />
+                android:layout_alignBottom="@+id/area4_name"
+                android:layout_alignEnd="@+id/area7_name"
+                android:layout_alignRight="@+id/area7_name"
+                android:src="@drawable/area6" />
 
             <TextView
+                android:tag="6"
+                android:id="@+id/area6_name"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginLeft="83dp"
@@ -102,6 +117,7 @@
                 android:textSize="10sp" />
 
             <ImageView
+                android:tag="area5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="111dp"
@@ -109,15 +125,18 @@
                 android:src="@drawable/area5" />
 
             <TextView
+                android:tag="5"
+                android:id="@+id/area5_name"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginLeft="132dp"
                 android:layout_marginTop="200dp"
-                android:textSize="10sp"
+                android:text="동작 관악\n    금천"
                 android:textColor="@color/colorAccent"
-                android:text="동작 관악\n    금천"/>
+                android:textSize="10sp" />
 
             <ImageView
+                android:tag="area4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="25dp"
@@ -126,16 +145,18 @@
                 android:src="@drawable/area4" />
 
             <TextView
+                android:tag="4"
+                android:id="@+id/area4_name"
                 android:layout_width="wrap_content"
                 android:layout_height="12dp"
                 android:layout_marginLeft="201dp"
                 android:layout_marginTop="199dp"
-                android:textSize="10sp"
-                android:textColor="@color/colorAccent"
                 android:text="서초 강남"
-                android:id="@+id/textView" />
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp" />
 
             <ImageView
+                android:tag="area3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="246dp"
@@ -143,15 +164,15 @@
                 android:src="@drawable/area3" />
 
             <TextView
+                android:tag="3"
+                android:id="@+id/area3_name"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginLeft="267dp"
                 android:layout_marginTop="165dp"
-                android:textSize="10sp"
+                android:text="강동\n송파"
                 android:textColor="@color/colorAccent"
-                android:text="강동\n송파"/>
-
-
+                android:textSize="10sp" />
 
         </RelativeLayout>
 
@@ -173,7 +194,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="서울시 마포구 연남동"
+                android:text="서울시 마포구"
                 android:textColor="@color/colorAccent"
                 android:textSize="13sp" />
 
