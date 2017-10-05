@@ -1,6 +1,7 @@
 package dct.com.everyfoody.ui.home.user;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -10,16 +11,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.ui.detail.DetailActivity;
+import dct.com.everyfoody.ui.home.MapClipDataHelper;
+
+import static android.media.CamcorderProfile.get;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int MAP_CLIP_COUNT = 8;
+
     @BindView(R.id.main_fab)
     FloatingActionButton fab;
     @BindView(R.id.main_rcv)
@@ -28,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
     Toolbar guestToolbar;
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
+    @BindView(R.id.selected_address_name)
+    TextView selectedAddressName;
+
+    private ImageView[] mapClipImageViews;
+    private TextView[] mapClipTextViews;
+    private int lastClickedMapPosition = 8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +55,23 @@ public class MainActivity extends AppCompatActivity {
         setRecycler();
         getInitData();
 
+        MapClipDataHelper.initialize();
+
+        mapClipTextViews = new TextView[MAP_CLIP_COUNT];
+        mapClipImageViews = new ImageView[MAP_CLIP_COUNT];
+        View mapClipContainer = findViewById(R.id.map_clip_container);
+        for (int i = 0; i < MAP_CLIP_COUNT; i++) {
+            TextView childMapClipTextView = mapClipContainer.findViewWithTag((i + 1) + "");
+            ImageView childMapClipImageView = mapClipContainer.findViewWithTag("area" + (i + 1));
+
+            childMapClipTextView.setOnClickListener(mapClipClickListener);
+            mapClipTextViews[i] = childMapClipTextView;
+            mapClipImageViews[i] = childMapClipImageView;
+        }
+
     }
 
-    private void setRecycler(){
+    private void setRecycler() {
         mainRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mainRecycler.setAdapter(new TruckRecyclerAdapter());
     }
@@ -56,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
     }
 
-    private void getInitData(){
+    private void getInitData() {
         /*TODO
         서버와 통신부 추가!!
          */
@@ -90,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         위에 주석 풀어주고 아래 지웁시다!!
          */
 
-        if(id == R.id.menu_notify_true){
+        if (id == R.id.menu_notify_true) {
             Intent detailIntent = new Intent(this, DetailActivity.class);
             startActivity(detailIntent);
         }
@@ -116,6 +146,43 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
             Intent detailIntent = new Intent(view.getContext(), DetailActivity.class);
             startActivity(detailIntent);
+        }
+    };
+
+    private View.OnClickListener mapClipClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int key = Integer.parseInt((String) view.getTag());
+
+
+            String[] locationInfo = MapClipDataHelper.getLocationTextInfo(key);
+            String resultGuName;
+            if (locationInfo[0].endsWith("구"))
+                resultGuName = locationInfo[0];
+            else
+                resultGuName = locationInfo[0] + "구";
+
+            selectedAddressName.setText("서울시 " + resultGuName);
+
+            ImageView clickedAreaImageView = mapClipImageViews[key - 1];
+            TextView clickedAreaTextView = mapClipTextViews[key - 1];
+
+            clickedAreaTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+            clickedAreaImageView.setImageResource(MapClipDataHelper.getMapImage(key, false));
+
+            ImageView lastClickedImageView = mapClipImageViews[lastClickedMapPosition - 1];
+            TextView lastClickedTextView = mapClipTextViews[lastClickedMapPosition - 1];
+            lastClickedTextView.setTextColor(getResources().getColor(R.color.colorAccent));
+            lastClickedImageView.setImageResource(MapClipDataHelper.getMapImage(lastClickedMapPosition, true));
+
+            //TODO: 해당 구의 트럭리스트 데이터 가져오기
+            /*
+            *
+            *
+            *
+            * */
+
+            lastClickedMapPosition = key;
         }
     };
 
