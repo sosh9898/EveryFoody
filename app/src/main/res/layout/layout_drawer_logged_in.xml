@@ -5,6 +5,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profile_image"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="77dp"
+        android:background="@null"
+        app:civ_border_color="#26000000"
+        app:civ_border_width="2dp"
+        android:src="@color/colorPrimary" />
 
     <RelativeLayout
         android:layout_marginTop="134dp"
@@ -23,7 +33,7 @@
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="남채은" />
+            android:text="남채은" />
 
         <RelativeLayout
             android:id="@+id/login_container"
@@ -47,7 +57,7 @@
                 android:layout_marginTop="12dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="14sp"
-                tools:text="예약내역" />
+                android:text="예약내역" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -57,7 +67,7 @@
                 android:layout_marginTop="34dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="45sp"
-                tools:text="3" />
+                android:text="3" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +78,7 @@
                 android:layout_marginTop="12dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="14sp"
-                tools:text="즐겨찾기" />
+                android:text="즐겨찾기" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -80,7 +90,7 @@
                 android:layout_marginTop="34dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="45sp"
-                tools:text="4" />
+                android:text="4" />
 
         </RelativeLayout>
 
@@ -101,7 +111,7 @@
             android:layout_marginTop="19dp"
             android:textColor="@color/colorAccent"
             android:textSize="14sp"
-            tools:text="즐겨찾기 푸시알람" />
+            android:text="즐겨찾기 푸시알람" />
 
         <View
             android:id="@+id/divider_line2"
