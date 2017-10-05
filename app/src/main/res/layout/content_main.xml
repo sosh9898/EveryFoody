@@ -24,42 +24,98 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="177dp"
                 android:layout_marginTop="21dp"
-                android:src="@drawable/area_1" />
+                android:src="@drawable/area1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="205dp"
+                android:layout_marginTop="58dp"
+                android:text="도봉 강북\n성북 노원"
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="200dp"
                 android:layout_marginTop="95dp"
-                android:src="@drawable/area_2" />
+                android:src="@drawable/area2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="216dp"
+                android:layout_marginTop="129dp"
+                android:text="동대문 중랑\n 성동 광진"
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="98dp"
                 android:layout_marginTop="54dp"
-                android:src="@drawable/area_7" />
+                android:src="@drawable/area7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="37dp"
+                android:layout_marginLeft="129dp"
+                android:layout_marginTop="96dp"
+                android:text=" 은평\n 마포\n서대문"
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp"
+                android:id="@+id/textView2" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="153dp"
                 android:layout_marginTop="82dp"
-                android:src="@drawable/area_8" />
+                android:src="@drawable/area8_click" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="37dp"
+                android:layout_marginLeft="172dp"
+                android:layout_marginTop="121dp"
+                android:text="종로\n중구\n용산"
+                android:textColor="@color/colorPrimary"
+                android:textSize="10sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="36dp"
-                android:layout_marginTop="104dp"
-                android:src="@drawable/area_6" />
+                android:src="@drawable/area6"
+                android:layout_alignBottom="@+id/textView"
+                android:layout_alignRight="@+id/textView2"
+                android:layout_alignEnd="@+id/textView2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="83dp"
+                android:layout_marginTop="159dp"
+                android:text=" 강서 양천\n영등포 구로"
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="111dp"
                 android:layout_marginTop="182dp"
-                android:src="@drawable/area_5" />
+                android:src="@drawable/area5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="132dp"
+                android:layout_marginTop="200dp"
+                android:textSize="10sp"
+                android:textColor="@color/colorAccent"
+                android:text="동작 관악\n    금천"/>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -67,24 +123,44 @@
                 android:layout_marginBottom="25dp"
                 android:layout_marginLeft="186.8dp"
                 android:layout_marginTop="169.8dp"
-                android:src="@drawable/area_4" />
+                android:src="@drawable/area4" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="12dp"
+                android:layout_marginLeft="201dp"
+                android:layout_marginTop="199dp"
+                android:textSize="10sp"
+                android:textColor="@color/colorAccent"
+                android:text="서초 강남"
+                android:id="@+id/textView" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="246dp"
                 android:layout_marginTop="124dp"
-                android:src="@drawable/area_3" />
+                android:src="@drawable/area3" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="267dp"
+                android:layout_marginTop="165dp"
+                android:textSize="10sp"
+                android:textColor="@color/colorAccent"
+                android:text="강동\n송파"/>
+
 
 
         </RelativeLayout>
 
         <LinearLayout
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp"
-            android:layout_marginLeft="33dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="33dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
@@ -93,22 +169,23 @@
                 android:src="@drawable/location" />
 
             <TextView
-                android:layout_marginLeft="8dp"
+                android:id="@+id/selected_address_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="13sp"
+                android:layout_marginLeft="8dp"
+                android:text="서울시 마포구 연남동"
                 android:textColor="@color/colorAccent"
-                android:text="서울시 마포구 연남동"/>
+                android:textSize="13sp" />
 
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal"
             android:id="@+id/main_rcv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            tools:listitem = "@layout/layout_main_rcv_item"></android.support.v7.widget.RecyclerView>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            tools:listitem="@layout/layout_main_rcv_item"></android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
 
