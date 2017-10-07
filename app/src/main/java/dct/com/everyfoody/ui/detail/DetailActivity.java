@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +15,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.OrangeThemeActivity;
 import dct.com.everyfoody.ui.detail.edit.EditActivity;
 import dct.com.everyfoody.ui.detail.location.MapActivity;
 import dct.com.everyfoody.ui.detail.normal.NormalFragment;
 import dct.com.everyfoody.ui.detail.review.ReviewActivity;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends OrangeThemeActivity {
     @BindView(R.id.detail_toolbar)Toolbar detailToolbar;
     @BindView(R.id.detail_main_image)ImageView mainImage;
 

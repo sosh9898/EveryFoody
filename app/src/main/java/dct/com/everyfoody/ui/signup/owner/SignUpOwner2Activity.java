@@ -1,11 +1,11 @@
 package dct.com.everyfoody.ui.signup.owner;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.WhiteThemeActivity;
 
-public class SignUpOwner2Activity extends AppCompatActivity {
+public class SignUpOwner2Activity extends WhiteThemeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
