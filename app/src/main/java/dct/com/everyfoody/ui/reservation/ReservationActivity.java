@@ -1,11 +1,11 @@
 package dct.com.everyfoody.ui.reservation;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.WhiteThemeActivity;
 
-public class ReservationActivity extends AppCompatActivity {
+public class ReservationActivity extends WhiteThemeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

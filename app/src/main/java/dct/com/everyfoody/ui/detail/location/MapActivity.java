@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,8 +23,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.WhiteThemeActivity;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallback {
     @BindView(R.id.map_toolbar)Toolbar mapToolbar;
 
     final static double mLatitude = 37.5197889;   //위도
