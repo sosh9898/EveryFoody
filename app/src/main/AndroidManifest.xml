@@ -12,7 +12,11 @@
         <activity
             android:name=".ui.splash.SplashActivity"
             android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.home.user.MainActivity"
@@ -29,15 +33,19 @@
         <activity android:name=".ui.reservation.ReservationActivity" />
         <activity android:name=".ui.home.owner.turn.TurnActivity" />
         <activity android:name=".ui.detail.review.ReviewActivity" />
-        <activity android:name=".ui.detail.location.MapActivity"><intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".ui.detail.location.MapActivity">
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter></activity>
+        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD2gXcDAwK3hePZlnpWDp6XF9d76yZBTPM" />
+
+        <activity android:name=".ui.detail.edit.EditActivity" />
+        <activity android:name=".ui.signup.owner.SignUpOwner2Activity"></activity>
+        <activity android:name=".ui.signup.user.SignUp2Activity">
+
+        </activity>
     </application>
 
 </manifest>

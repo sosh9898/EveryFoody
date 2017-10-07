@@ -1,5 +1,6 @@
 package dct.com.everyfoody.ui.detail;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,8 +14,12 @@ import android.widget.ImageView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.ui.detail.edit.EditActivity;
+import dct.com.everyfoody.ui.detail.location.MapActivity;
 import dct.com.everyfoody.ui.detail.normal.NormalFragment;
+import dct.com.everyfoody.ui.detail.review.ReviewActivity;
 
 public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_toolbar)Toolbar detailToolbar;
@@ -76,7 +81,8 @@ public class DetailActivity extends AppCompatActivity {
 
 
         if(id == R.id.menu_detail_map){
-
+            Intent mapIntent = new Intent(this, MapActivity.class);
+            startActivity(mapIntent);
         }
         else if(id == R.id.menu_detail_bookmark_on || id == R.id.menu_detail_bookmark_off){
             /*TODO
@@ -84,7 +90,8 @@ public class DetailActivity extends AppCompatActivity {
              */
         }
         else if(id == R.id.menu_detail_edit){
-
+            Intent editIntent = new Intent(this, EditActivity.class);
+            startActivity(editIntent);
         }
 
 
@@ -102,6 +109,12 @@ public class DetailActivity extends AppCompatActivity {
          */
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @OnClick(R.id.review_btn)
+    public void reviewClick(View view){
+        Intent reviewIntent = new Intent(this, ReviewActivity.class);
+        startActivity(reviewIntent);
     }
 
 }
