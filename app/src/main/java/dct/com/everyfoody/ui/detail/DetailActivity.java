@@ -1,7 +1,7 @@
 package dct.com.everyfoody.ui.detail;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,25 +10,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
-import dct.com.everyfoody.ui.detail.menu.MenuFragment;
+import dct.com.everyfoody.ui.detail.edit.EditActivity;
+import dct.com.everyfoody.ui.detail.location.MapActivity;
 import dct.com.everyfoody.ui.detail.normal.NormalFragment;
+import dct.com.everyfoody.ui.detail.review.ReviewActivity;
 
 public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_toolbar)Toolbar detailToolbar;
     @BindView(R.id.detail_main_image)ImageView mainImage;
-    @BindView(R.id.normal_info_btn)Button normalButton;
-    @BindView(R.id.menu_info_btn)Button menuButton;
-
-    final int MENU = 10;
-    final int NORMAL = 11;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +68,6 @@ public class DetailActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    public void replaceFragment(Fragment fragment, @Nullable Bundle bundle){
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        fragment.setArguments(bundle);
-        transaction.replace(R.id.detail_content, fragment);
-        transaction.commit();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,7 +81,8 @@ public class DetailActivity extends AppCompatActivity {
 
 
         if(id == R.id.menu_detail_map){
-
+            Intent mapIntent = new Intent(this, MapActivity.class);
+            startActivity(mapIntent);
         }
         else if(id == R.id.menu_detail_bookmark_on || id == R.id.menu_detail_bookmark_off){
             /*TODO
@@ -101,7 +90,8 @@ public class DetailActivity extends AppCompatActivity {
              */
         }
         else if(id == R.id.menu_detail_edit){
-
+            Intent editIntent = new Intent(this, EditActivity.class);
+            startActivity(editIntent);
         }
 
 
@@ -121,31 +111,10 @@ public class DetailActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    @OnClick(R.id.normal_info_btn)
-    void normalClick(View view){
-        changeButton(NORMAL);
-        replaceFragment(NormalFragment.getInstance(), null);
-    }
-
-    @OnClick(R.id.menu_info_btn)
-    void menuClick(View view){
-        changeButton(MENU);
-        replaceFragment(MenuFragment.getInstance(), null);
-    }
-
-    private void changeButton(int i){
-        if(i == MENU){
-            menuButton.setBackgroundResource(R.drawable.detail_info_selected);
-            normalButton.setBackgroundResource(R.drawable.detail_info_unselected);
-            menuButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-            normalButton.setTextColor(getResources().getColor(R.color.colorAccent));
-        }
-        else if(i == NORMAL){
-            menuButton.setBackgroundResource(R.drawable.detail_info_unselected);
-            normalButton.setBackgroundResource(R.drawable.detail_info_selected);
-            menuButton.setTextColor(getResources().getColor(R.color.colorAccent));
-            normalButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        }
+    @OnClick(R.id.review_btn)
+    public void reviewClick(View view){
+        Intent reviewIntent = new Intent(this, ReviewActivity.class);
+        startActivity(reviewIntent);
     }
 
 }

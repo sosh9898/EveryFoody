@@ -13,27 +13,15 @@
             android:id="@+id/menu_item_image_container"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:background="@color/colorDefaultBackground">
+            android:background="@color/colorEditMainImage">
 
-            <TextView
-                android:layout_marginTop="32dp"
-                android:id="@+id/menu_item_name"
-                android:layout_width="88dp"
-                android:layout_height="19dp"
-                android:layout_centerHorizontal="true"
-                android:gravity="center"
-                android:text="메뉴 사진"
-                android:textColor="@color/colorDefaultText"
-                android:textSize="16sp" />
 
             <ImageView
-                android:layout_marginTop="6dp"
                 android:id="@+id/menu_item_image"
                 android:layout_width="59dp"
                 android:layout_height="59dp"
-                android:layout_below="@+id/menu_item_name"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/photo" />
+                android:layout_centerInParent="true"
+                android:src="@drawable/photo_icon" />
         </RelativeLayout>
 
         <RelativeLayout
