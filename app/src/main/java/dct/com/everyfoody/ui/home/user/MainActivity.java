@@ -226,6 +226,8 @@ public class MainActivity extends WhiteThemeActivity {
         public void onClick(View view) {
             int key = Integer.parseInt((String) view.getTag());
 
+            if(lastClickedMapPosition==key)
+                return;
 
             String[] locationInfo = MapClipDataHelper.getLocationTextInfo(key);
             String resultGuName;
