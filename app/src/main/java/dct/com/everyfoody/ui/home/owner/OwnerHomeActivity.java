@@ -1,11 +1,11 @@
 package dct.com.everyfoody.ui.home.owner;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.WhiteThemeActivity;
 
-public class OwnerHomeActivity extends AppCompatActivity {
+public class OwnerHomeActivity extends WhiteThemeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

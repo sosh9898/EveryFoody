@@ -5,8 +5,33 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_marginTop="22dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:src="@drawable/line_3"/>
+
+    <TextView
+        android:layout_gravity="center"
+        android:layout_marginTop="17dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="#하태핫 #큐브스테이크 #15년경"/>
+
+    <ImageView
+        android:layout_marginTop="17dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:src="@drawable/line_3"/>
     
     <LinearLayout
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -85,36 +110,12 @@
 
         </RelativeLayout>
 
-        <ImageView
-            android:layout_marginTop="22dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            android:src="@drawable/line_3"/>
-
-        <TextView
-            android:layout_gravity="center"
-            android:layout_marginTop="17dp"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorAccent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="#하태핫 #큐브스테이크 #15년경"/>
-
-        <ImageView
-            android:layout_marginTop="17dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            android:src="@drawable/line_3"/>
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/review_rcv"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="25dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/layout_review_rcv_item"></android.support.v7.widget.RecyclerView>
+            tools:listitem="@layout/layout_menu_rcv_item"></android.support.v7.widget.RecyclerView>
         
     </LinearLayout>
 

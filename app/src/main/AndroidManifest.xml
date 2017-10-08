@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/WhiteTheme">
         <activity
             android:name=".ui.splash.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -18,21 +18,34 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.home.user.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/WhiteTheme" />
         <activity android:name=".ui.detail.DetailActivity" />
         <activity android:name=".ui.signup.user.SignUpActivity" />
-        <activity android:name=".ui.login.LoginActivity"></activity>
+        <activity android:name=".ui.login.LoginActivity" />
         <activity android:name=".ui.signup.owner.SignUpOwnerActivity" />
         <activity android:name=".ui.signup.SignUpMainActivity" />
         <activity android:name=".ui.home.owner.OwnerHomeActivity" />
         <activity android:name=".ui.home.owner.register.TruckRegisterActivity" />
         <activity android:name=".ui.notification.NotifyActivity" />
         <activity android:name=".ui.reservation.ReservationActivity" />
-        <activity android:name=".ui.home.owner.turn.TurnActivity"></activity>
+        <activity android:name=".ui.home.owner.turn.TurnActivity" />
+        <activity android:name=".ui.detail.review.ReviewActivity" />
+        <activity android:name=".ui.detail.location.MapActivity">
+
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD2gXcDAwK3hePZlnpWDp6XF9d76yZBTPM" />
+
+        <activity android:name=".ui.detail.edit.EditActivity" />
+        <activity android:name=".ui.signup.owner.SignUpOwner2Activity"></activity>
+        <activity android:name=".ui.signup.user.SignUp2Activity">
+
+        </activity>
     </application>
 
 </manifest>
