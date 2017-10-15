@@ -6,24 +6,42 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.OrangeThemeActivity;
+import dct.com.everyfoody.base.util.BundleBuilder;
+import dct.com.everyfoody.global.ApplicationController;
+import dct.com.everyfoody.model.StoreInfo;
+import dct.com.everyfoody.request.NetworkService;
 import dct.com.everyfoody.ui.detail.edit.EditActivity;
 import dct.com.everyfoody.ui.detail.location.MapActivity;
 import dct.com.everyfoody.ui.detail.normal.NormalFragment;
 import dct.com.everyfoody.ui.detail.review.ReviewActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity extends OrangeThemeActivity {
     @BindView(R.id.detail_toolbar)Toolbar detailToolbar;
     @BindView(R.id.detail_main_image)ImageView mainImage;
+
+    public static final String TAG = DetailActivity.class.getSimpleName();
+
+    private int storeID;
+    private NetworkService networkService;
+    private StoreInfo storeInfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,21 +49,46 @@ public class DetailActivity extends OrangeThemeActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
         getInitData();
-
-        if(savedInstanceState == null){
-            addFragment(NormalFragment.getInstance(), null);
-            //TODO 네트워킹 이후 번들로 넘겨줄 데이터 받을 것
-        }
-        setToolbar();
+        getStoreInfo();
     }
 
     private void getInitData(){
-        //TODO 네트워킹
+        Intent getData = getIntent();
+        storeID = getData.getExtras().getInt("storeID");
+        networkService = ApplicationController.getInstance().getNetworkService();
+    }
+
+    private void getStoreInfo(){
+        Call<StoreInfo> getStoreInfo = networkService.getStoreInfo("nonLoginUser", storeID);
+
+        getStoreInfo.enqueue(new Callback<StoreInfo>() {
+            @Override
+            public void onResponse(Call<StoreInfo> call, Response<StoreInfo> response) {
+                if(response.isSuccessful()){
+                    Log.d("???", "1");
+
+                    if(response.body().getStatus().equals("success")){
+                        storeInfo = response.body();
+                        setToolbar();
+                        Gson gson = new Gson();
+                        String info = gson.toJson(storeInfo);
+                        addFragment(NormalFragment.getInstance(), BundleBuilder.create().with("storeInfo",info).build());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<StoreInfo> call, Throwable t) {
+                Log.d(TAG, "error : "+t.toString());
+            }
+        });
+
     }
 
     private void setToolbar(){
-        //Glide.with(this).load().into(mainImage); TODO    네트워킹 정보를 바탕으로 이미지 및 툴바 타이틀 설정
-        //detailToolbar.setTitle();
+        Glide.with(this).load(storeInfo.getDetailInfo().getBasicInfo().getStoreImage()).into(mainImage);
+        detailToolbar.setTitle(storeInfo.getDetailInfo().getBasicInfo().getStoreName());
         detailToolbar.setTitleTextColor(getResources().getColor(R.color.colorPrimary));
         setSupportActionBar(detailToolbar);
         detailToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_white));
@@ -55,8 +98,6 @@ public class DetailActivity extends OrangeThemeActivity {
                 finish();
             }
         });
-
-
     }
 
 
