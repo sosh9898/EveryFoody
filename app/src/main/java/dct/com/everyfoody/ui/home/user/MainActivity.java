@@ -73,7 +73,7 @@ public class MainActivity extends WhiteThemeActivity {
     private TextView[] mapClipTextViews;
     private DefaultDrawer defaultDrawer;
     private LoggedDrawer loggedDrawer;
-    private int lastClickedMapPosition = 8;
+    private int lastClickedMapPosition = 3;
     private MainList mainList;
     private List<MainList.TruckList> truckLists;
 
@@ -288,7 +288,6 @@ public class MainActivity extends WhiteThemeActivity {
 
             ImageView clickedAreaImageView = mapClipImageViews[key - 1];
             TextView clickedAreaTextView = mapClipTextViews[key - 1];
-
             clickedAreaTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
             clickedAreaImageView.setImageResource(MapClipDataHelper.getMapImage(key, false));
 
