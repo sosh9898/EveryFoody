@@ -1,10 +1,8 @@
 package dct.com.everyfoody.ui.detail.edit;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,12 +10,15 @@ import android.view.View;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
 
 public class EditActivity extends WhiteThemeActivity {
     @BindView(R.id.edit_toolbar)Toolbar editToolbar;
+    @BindView(R.id.edit_viewpager)ViewPager editViewPager;
+    @BindView(R.id.edit_tablayout)TabLayout editTab;
+
+    private EditPagerAdapter editPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +27,7 @@ public class EditActivity extends WhiteThemeActivity {
         ButterKnife.bind(this);
 
         setToolbar();
-        if(savedInstanceState == null){
-            addFragment(NormalEditFragment.getInstance(),null);
-        }
+        setLayout();
 
     }
 
@@ -44,22 +43,13 @@ public class EditActivity extends WhiteThemeActivity {
         });
     }
 
-    public void addFragment(Fragment fragment, Bundle bundle){
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        fragment.setArguments(bundle);
-        transaction.add(R.id.edit_content, fragment);
-        transaction.commit();
+    private void setLayout(){
+        editPagerAdapter = new EditPagerAdapter(getSupportFragmentManager());
+        editViewPager.setAdapter(editPagerAdapter);
+        editTab.addTab(editTab.newTab().setText("기본정보"));
+        editTab.addTab(editTab.newTab().setText("메뉴정보"));
+        editTab.setupWithViewPager(editViewPager);
     }
-
-    public void replaceFragment(Fragment fragment, @Nullable Bundle bundle){
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        fragment.setArguments(bundle);
-        transaction.replace(R.id.edit_content, fragment);
-        transaction.commit();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -78,15 +68,5 @@ public class EditActivity extends WhiteThemeActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @OnClick(R.id.edit_normal_btn)
-    public void normalClick(View view){
-        replaceFragment(NormalEditFragment.getInstance(), null);
-    }
-
-    @OnClick(R.id.edit_menu_btn)
-    public void menuClick(View view){
-        replaceFragment(MenuEditFragment.getInstance(), null);
     }
 }

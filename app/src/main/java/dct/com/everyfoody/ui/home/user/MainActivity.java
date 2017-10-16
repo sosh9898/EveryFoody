@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,15 +19,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.SharedPreferencesService;
+import dct.com.everyfoody.global.ApplicationController;
+import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.request.NetworkService;
 import dct.com.everyfoody.ui.detail.DetailActivity;
 import dct.com.everyfoody.ui.home.MapClipDataHelper;
 import dct.com.everyfoody.ui.login.LoginActivity;
 import dct.com.everyfoody.ui.reservation.ReservationActivity;
 import dct.com.everyfoody.ui.signup.SignUpMainActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
+
 
 public class MainActivity extends WhiteThemeActivity {
 
@@ -48,21 +65,26 @@ public class MainActivity extends WhiteThemeActivity {
     @BindView(R.id.drawer_logged)
     View drawerLogged;
 
+    public static final String TAG = MainActivity.class.getSimpleName();
+
+    private TruckRecyclerAdapter adapter;
+    private NetworkService networkService;
     private ImageView[] mapClipImageViews;
     private TextView[] mapClipTextViews;
     private DefaultDrawer defaultDrawer;
     private LoggedDrawer loggedDrawer;
     private int lastClickedMapPosition = 8;
+    private MainList mainList;
+    private List<MainList.TruckList> truckLists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+        setInitSetting();
+        getMainData(3);
         setToolbar();
-        setRecycler();
-        getInitData();
         bindDrawerEvent();
 
         MapClipDataHelper.initialize();
@@ -79,6 +101,12 @@ public class MainActivity extends WhiteThemeActivity {
             mapClipImageViews[i] = childMapClipImageView;
         }
 
+    }
+
+    private void setInitSetting() {
+        networkService = ApplicationController.getInstance().getNetworkService();
+        ViewCompat.setNestedScrollingEnabled(mainRecycler, false);
+        truckLists = new ArrayList<>();
     }
 
     private void bindDrawerEvent() {
@@ -119,18 +147,18 @@ public class MainActivity extends WhiteThemeActivity {
         });
         loggedDrawer.bookMarkCountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-           public void onClick(View view) {
+            public void onClick(View view) {
                 //즐겨찾기 목록
                 Toast.makeText(MainActivity.this, "즐겨찾기액티비티 구현 후 스택연결 해야함", Toast.LENGTH_SHORT).show();
             }
         });
-        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
-                startActivity(reservationIntent);
-            }
-        });
+//        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
+//                startActivity(reservationIntent);
+//            }
+//        });
 
         View.OnClickListener profileEditClickListener = new View.OnClickListener() {
             @Override
@@ -145,7 +173,10 @@ public class MainActivity extends WhiteThemeActivity {
 
     private void setRecycler() {
         mainRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mainRecycler.setAdapter(new TruckRecyclerAdapter());
+        adapter = new TruckRecyclerAdapter(truckLists, onClickListener);
+        mainRecycler.setAdapter(adapter);
+        Log.d("dd", "??");
+
     }
 
     private void setToolbar() {
@@ -158,10 +189,27 @@ public class MainActivity extends WhiteThemeActivity {
         toggle.syncState();
     }
 
-    private void getInitData() {
-        /*TODO
-        서버와 통신부 추가!!
-         */
+    private void getMainData(int index) {
+
+        Call<MainList> getMainList = networkService.getMainLists("nonLoginUser", index, 44, 44);
+        getMainList.enqueue(new Callback<MainList>() {
+            @Override
+            public void onResponse(Call<MainList> call, Response<MainList> response) {
+                if (response.isSuccessful()) {
+                    mainList = response.body();
+                    if (mainList.getStatus().equals("success")) {
+                        truckLists = mainList.getTruckLists();
+                        setRecycler();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MainList> call, Throwable t) {
+                Log.e(TAG, "error : " + t.toString());
+            }
+        });
+
     }
 
     @Override
@@ -193,8 +241,6 @@ public class MainActivity extends WhiteThemeActivity {
          */
 
         if (id == R.id.menu_notify_true) {
-            Intent detailIntent = new Intent(this, DetailActivity.class);
-            startActivity(detailIntent);
         }
 
 
@@ -216,7 +262,9 @@ public class MainActivity extends WhiteThemeActivity {
     public View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            final int tempPosition = mainRecycler.getChildPosition(view);
             Intent detailIntent = new Intent(view.getContext(), DetailActivity.class);
+            detailIntent.putExtra("storeID", truckLists.get(tempPosition).getStoreID());
             startActivity(detailIntent);
         }
     };
@@ -226,7 +274,7 @@ public class MainActivity extends WhiteThemeActivity {
         public void onClick(View view) {
             int key = Integer.parseInt((String) view.getTag());
 
-            if(lastClickedMapPosition==key)
+            if (lastClickedMapPosition == key)
                 return;
 
             String[] locationInfo = MapClipDataHelper.getLocationTextInfo(key);
@@ -249,12 +297,7 @@ public class MainActivity extends WhiteThemeActivity {
             lastClickedTextView.setTextColor(getResources().getColor(R.color.colorAccent));
             lastClickedImageView.setImageResource(MapClipDataHelper.getMapImage(lastClickedMapPosition, true));
 
-            //TODO: 해당 구의 트럭리스트 데이터 가져오기
-            /*
-            *
-            *
-            *
-            * */
+            getMainData(key);
 
             lastClickedMapPosition = key;
         }
@@ -266,15 +309,15 @@ public class MainActivity extends WhiteThemeActivity {
 
         switch (requestCode) {
             case REQUEST_CODE_FOR_LOGIN:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     //로그인 성공
                     drawerDefault.setVisibility(View.GONE);
                     drawerLogged.setVisibility(View.VISIBLE);
-                    
+
                     int loginResult = data.getIntExtra(LoginActivity.LOGIN_RESULT, -1);
 
                     switch (loginResult) {
-                        case LoginActivity.RESULT_GUEST:
+                        case RESULT_GUEST:
                             loggedDrawer.orderNameTextView.setText("예약내역");
                             loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
                             break;
@@ -288,15 +331,15 @@ public class MainActivity extends WhiteThemeActivity {
 
                     }
 
-                }else {
+                } else {
                     //로그인 실패
                 }
                 break;
 
             case REQUEST_CODE_FOR_SIGNUP:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     //회원가입 성공
-                }else {
+                } else {
                     //회원가입 실패
                 }
                 break;
@@ -327,6 +370,29 @@ public class MainActivity extends WhiteThemeActivity {
         ImageView profileEditImageView;
         @BindView(R.id.push_alarm_list_text)
         TextView pushListTextView;
+
     }
 
+    @OnClick(R.id.bookmark_count)
+    public void bookmarkCountClick(View view){
+        switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
+            case RESULT_GUEST:
+                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
+                startActivity(reservationIntent);
+                break;
+            case RESULT_OWNER:
+                break;
+        }
+    }
+
+    @OnClick(R.id.order_count)
+    public void orderCountClick(View view){
+        switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
+            case RESULT_GUEST:
+
+                break;
+            case RESULT_OWNER:
+                break;
+        }
+    }
 }

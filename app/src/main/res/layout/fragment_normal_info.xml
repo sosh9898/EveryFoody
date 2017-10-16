@@ -1,125 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="25dp"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <ImageView
-        android:layout_marginTop="22dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
-        android:src="@drawable/line_3"/>
 
-    <TextView
-        android:layout_gravity="center"
-        android:layout_marginTop="17dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorAccent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="#하태핫 #큐브스테이크 #15년경"/>
-
-    <ImageView
-        android:layout_marginTop="17dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
-        android:src="@drawable/line_3"/>
-    
     <LinearLayout
-        android:layout_marginTop="20dp"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            
-            <TextView
-                android:layout_marginLeft="46dp"
-                android:text="운영시간"
-                android:textSize="13sp"
-                android:textColor="@color/colorAccent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-            <TextView
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="46dp"
-                android:id="@+id/opening_hours"
-                android:textSize="13sp"
-                android:textColor="@color/colorAccentText"
-                android:layout_width="wrap_content"
+
+        <TextView
+            android:id="@+id/store_info_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="17dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="#하태핫 #큐브스테이크 #15년경" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/line_3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="46dp"
+                    android:text="운영시간"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/opening_hours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="46dp"
+                    android:textColor="@color/colorAccentText"
+                    android:textSize="13sp"
+                    tools:text="10:00 - 22:00" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="10:00 - 22:00"/>
-            
-        </RelativeLayout>
+                android:layout_marginTop="12dp">
 
-        <RelativeLayout
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="46dp"
+                    android:text="브레이크 타임"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:layout_marginLeft="46dp"
-                android:text="브레이크 타임"
-                android:textSize="13sp"
-                android:textColor="@color/colorAccent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/break_hours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="46dp"
+                    android:textColor="@color/colorAccentText"
+                    android:textSize="13sp"
+                    tools:text="11:00 - 12:00" />
 
-            <TextView
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="46dp"
-                android:id="@+id/break_hours"
-                android:textSize="13sp"
-                android:textColor="@color/colorAccentText"
-                android:layout_width="wrap_content"
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="11:00 - 12:00"/>
+                android:layout_marginTop="12dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="46dp"
+                    android:text="전화번호"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13sp" />
 
-        <RelativeLayout
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/phone_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="46dp"
+                    android:textColor="@color/colorAccentText"
+                    android:textSize="13sp"
+                    tools:text="02-123-4567" />
 
-            <TextView
-                android:layout_marginLeft="46dp"
-                android:text="전화번호"
-                android:textSize="13sp"
-                android:textColor="@color/colorAccent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            </RelativeLayout>
 
-            <TextView
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="46dp"
-                android:id="@+id/phone_number"
-                android:textSize="13sp"
-                android:textColor="@color/colorAccentText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="02-123-4567"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/menu_rcv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="25dp"
+                tools:listitem="@layout/layout_menu_rcv_item"></android.support.v7.widget.RecyclerView>
 
-        </RelativeLayout>
+        </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/review_rcv"
-            android:layout_marginTop="25dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/layout_menu_rcv_item"></android.support.v7.widget.RecyclerView>
-        
+
     </LinearLayout>
-
-
-
-
-</LinearLayout>
+</android.support.v4.widget.NestedScrollView>
