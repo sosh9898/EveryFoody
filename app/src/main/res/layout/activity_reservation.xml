@@ -9,10 +9,21 @@
     tools:context="dct.com.everyfoody.ui.reservation.ReservationActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/notification_toolbar"
+        android:id="@+id/reservation_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"></android.support.v7.widget.Toolbar>
+        android:background="?attr/colorPrimary">
+
+        <TextView
+            android:layout_gravity="center"
+            android:text = "즐겨찾기"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </android.support.v7.widget.Toolbar>
 
 
     <android.support.v7.widget.RecyclerView

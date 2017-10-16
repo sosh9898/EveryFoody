@@ -24,8 +24,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.MainList;
 import dct.com.everyfoody.request.NetworkService;
@@ -37,6 +39,9 @@ import dct.com.everyfoody.ui.signup.SignUpMainActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
 
 
 public class MainActivity extends WhiteThemeActivity {
@@ -78,7 +83,7 @@ public class MainActivity extends WhiteThemeActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setInitSetting();
-        getMainData();
+        getMainData(3);
         setToolbar();
         bindDrawerEvent();
 
@@ -147,13 +152,13 @@ public class MainActivity extends WhiteThemeActivity {
                 Toast.makeText(MainActivity.this, "즐겨찾기액티비티 구현 후 스택연결 해야함", Toast.LENGTH_SHORT).show();
             }
         });
-        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
-                startActivity(reservationIntent);
-            }
-        });
+//        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
+//                startActivity(reservationIntent);
+//            }
+//        });
 
         View.OnClickListener profileEditClickListener = new View.OnClickListener() {
             @Override
@@ -184,9 +189,9 @@ public class MainActivity extends WhiteThemeActivity {
         toggle.syncState();
     }
 
-    private void getMainData() {
+    private void getMainData(int index) {
 
-        Call<MainList> getMainList = networkService.getMainLists("nonLoginUser", 2, 44, 44);
+        Call<MainList> getMainList = networkService.getMainLists("nonLoginUser", index, 44, 44);
         getMainList.enqueue(new Callback<MainList>() {
             @Override
             public void onResponse(Call<MainList> call, Response<MainList> response) {
@@ -236,8 +241,6 @@ public class MainActivity extends WhiteThemeActivity {
          */
 
         if (id == R.id.menu_notify_true) {
-            Intent detailIntent = new Intent(this, DetailActivity.class);
-            startActivity(detailIntent);
         }
 
 
@@ -294,12 +297,7 @@ public class MainActivity extends WhiteThemeActivity {
             lastClickedTextView.setTextColor(getResources().getColor(R.color.colorAccent));
             lastClickedImageView.setImageResource(MapClipDataHelper.getMapImage(lastClickedMapPosition, true));
 
-            //TODO: 해당 구의 트럭리스트 데이터 가져오기
-            /*
-            *
-            *
-            *
-            * */
+            getMainData(key);
 
             lastClickedMapPosition = key;
         }
@@ -319,7 +317,7 @@ public class MainActivity extends WhiteThemeActivity {
                     int loginResult = data.getIntExtra(LoginActivity.LOGIN_RESULT, -1);
 
                     switch (loginResult) {
-                        case LoginActivity.RESULT_GUEST:
+                        case RESULT_GUEST:
                             loggedDrawer.orderNameTextView.setText("예약내역");
                             loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
                             break;
@@ -372,6 +370,29 @@ public class MainActivity extends WhiteThemeActivity {
         ImageView profileEditImageView;
         @BindView(R.id.push_alarm_list_text)
         TextView pushListTextView;
+
     }
 
+    @OnClick(R.id.bookmark_count)
+    public void bookmarkCountClick(View view){
+        switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
+            case RESULT_GUEST:
+                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
+                startActivity(reservationIntent);
+                break;
+            case RESULT_OWNER:
+                break;
+        }
+    }
+
+    @OnClick(R.id.order_count)
+    public void orderCountClick(View view){
+        switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
+            case RESULT_GUEST:
+
+                break;
+            case RESULT_OWNER:
+                break;
+        }
+    }
 }
