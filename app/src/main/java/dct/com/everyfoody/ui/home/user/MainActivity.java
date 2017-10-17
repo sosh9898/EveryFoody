@@ -31,6 +31,7 @@ import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.MainList;
 import dct.com.everyfoody.request.NetworkService;
+import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.detail.DetailActivity;
 import dct.com.everyfoody.ui.home.MapClipDataHelper;
 import dct.com.everyfoody.ui.login.LoginActivity;
@@ -148,8 +149,8 @@ public class MainActivity extends WhiteThemeActivity {
         loggedDrawer.bookMarkCountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //즐겨찾기 목록
-                Toast.makeText(MainActivity.this, "즐겨찾기액티비티 구현 후 스택연결 해야함", Toast.LENGTH_SHORT).show();
+                Intent bookmark = new Intent(getApplicationContext(), BookmarkActivity.class);
+                startActivity(bookmark);
             }
         });
 //        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {

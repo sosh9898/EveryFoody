@@ -51,6 +51,7 @@
         <activity android:name=".ui.signup.user.SignUp2Activity">
 
         </activity>
+        <activity android:name=".ui.bookmark.BookmarkActivity"/>
 
 
     </application>
