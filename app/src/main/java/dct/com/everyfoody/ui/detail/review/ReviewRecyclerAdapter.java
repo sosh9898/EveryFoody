@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
+
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -14,64 +16,60 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
-import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.model.ResReview;
+
 
 /**
  * Created by jyoung on 2017. 10. 4..
  */
 
 public class ReviewRecyclerAdapter extends RecyclerView.Adapter {
-    private List<MainList.TruckList> bookmarkList;
-    private View.OnClickListener onClickListener;
+    private List<ResReview.Review> reviewList;
 
-    public void refreshAdapter(List<MainList.TruckList> bookmarkList){
-        this.bookmarkList = bookmarkList;
+    public void refreshAdapter(List<ResReview.Review> reviewList){
+        this.reviewList = reviewList;
+        notifyDataSetChanged();
     }
 
-    public ReviewRecyclerAdapter(List<MainList.TruckList> bookmarkList, View.OnClickListener onClickListener) {
-        this.bookmarkList = bookmarkList;
-        this.onClickListener = onClickListener;
+    public ReviewRecyclerAdapter(List<ResReview.Review> reviewList) {
+        this.reviewList = reviewList;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_main_rcv_item, parent, false);
-        view.setOnClickListener(onClickListener);
-        return new MainTruckListViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_review_rcv_item, parent, false);
+        return new ReviewViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((MainTruckListViewHolder)holder).bindView(bookmarkList.get(position));
+        ((ReviewViewHolder)holder).bindView(reviewList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return bookmarkList != null ? bookmarkList.size() : 0;
+        return reviewList != null ? reviewList.size() : 0;
     }
 
 
-    public class MainTruckListViewHolder extends RecyclerView.ViewHolder{
-        @BindView(R.id.main_list_item_image)
-        ImageView mainListImage;
-        @BindView(R.id.food_truck_name)
-        TextView foodTruckName;
-        @BindView(R.id.food_truck_distance)
-        TextView foodTruckDistance;
-        @BindView(R.id.food_truck_booker_count)
-        TextView foodTruckBookerCount;
+    public class ReviewViewHolder extends RecyclerView.ViewHolder{
+        @BindView(R.id.review_writer_name)TextView reviewWriter;
+        @BindView(R.id.review_content)TextView reviewContent;
+        @BindView(R.id.review_image)ImageView reviewImage;
+        @BindView(R.id.review_rating)RatingBar reviewRating;
 
-
-        public MainTruckListViewHolder(View itemView) {
+        public ReviewViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindView(MainList.TruckList truckList){
-            Glide.with(mainListImage.getContext()).load(truckList.getStoreImage()).into(mainListImage);
-            foodTruckName.setText(truckList.getStoreName());
-            foodTruckDistance.setText(truckList.getStoreDistance()+"");
-            foodTruckBookerCount.setText(truckList.getReservationCount()+"");
+        public void bindView(ResReview.Review reviewItem){
+            reviewWriter.setText(reviewItem.getReviewWriter());
+            reviewContent.setText(reviewItem.getReviewContent());
+            reviewRating.setRating((float)reviewItem.getReviewScore()/2);
+
+            if(reviewItem.getReviewImageUrl() != null)
+                Glide.with(reviewImage.getContext()).load(reviewItem.getReviewImageUrl()).into(reviewImage);
         }
 
 

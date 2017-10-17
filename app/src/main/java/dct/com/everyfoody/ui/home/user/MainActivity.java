@@ -265,7 +265,7 @@ public class MainActivity extends WhiteThemeActivity {
         public void onClick(View view) {
             final int tempPosition = mainRecycler.getChildPosition(view);
             Intent detailIntent = new Intent(view.getContext(), DetailActivity.class);
-            detailIntent.putExtra("storeID", truckLists.get(tempPosition).getStoreID());
+            detailIntent.putExtra("storeId", truckLists.get(tempPosition).getStoreID());
             startActivity(detailIntent);
         }
     };

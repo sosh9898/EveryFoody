@@ -3,6 +3,7 @@ package dct.com.everyfoody.request;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.model.StoreInfo;
 import dct.com.everyfoody.model.UserInfo;
 import retrofit2.Call;
@@ -42,6 +43,7 @@ public interface NetworkService {
     @GET("/bookmark/lists/{latitude}/{longitude}")
     Call<MainList> getBookmarkList(@Header("token") String token, @Path("latitude") int lat, @Path("longitude") int log);
 
-
-
+    //리뷰 리스트
+    @GET("/review/lists/{storeID}")
+    Call<ResReview> getReviewList(@Header("token") String token, @Path("storeID") int storeId);
 }

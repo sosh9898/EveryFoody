@@ -45,7 +45,7 @@ public class DetailActivity extends OrangeThemeActivity {
 
     public static final String TAG = DetailActivity.class.getSimpleName();
 
-    private int storeID;
+    private int storeId;
     private NetworkService networkService;
     private StoreInfo storeInfo;
     private int bookmarkFlag;
@@ -62,12 +62,12 @@ public class DetailActivity extends OrangeThemeActivity {
 
     private void getInitData(){
         Intent getData = getIntent();
-        storeID = getData.getExtras().getInt("storeID");
+        storeId = getData.getExtras().getInt("storeId");
         networkService = ApplicationController.getInstance().getNetworkService();
     }
 
     private void getStoreInfo(){
-        Call<StoreInfo> getStoreInfo = networkService.getStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeID);
+        Call<StoreInfo> getStoreInfo = networkService.getStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
 
         getStoreInfo.enqueue(new Callback<StoreInfo>() {
             @Override
@@ -158,9 +158,7 @@ public class DetailActivity extends OrangeThemeActivity {
         MenuItem bookmarkOff = menu.findItem(R.id.menu_detail_bookmark_off);
         MenuItem edit = menu.findItem(R.id.menu_detail_edit);
 
-        Log.d("fd", SharedPreferencesService.getInstance().getPrefIntegerData("user_status")+"");
         if(SharedPreferencesService.getInstance().getPrefIntegerData("user_status") ==RESULT_GUEST){
-            Log.d("bookmark", "1");
 
             edit.setVisible(false);
             if(bookmarkFlag == 0){
@@ -173,14 +171,12 @@ public class DetailActivity extends OrangeThemeActivity {
             }
         }
         else if(SharedPreferencesService.getInstance().getPrefIntegerData("userStatus") == RESULT_OWNER){
-            Log.d("bookmark", "2");
 
             map.setVisible(false);
             bookmarkOff.setVisible(false);
             bookmarkOn.setVisible(false);
         }
         else{
-            Log.d("bookmark", "3");
 
             bookmarkOn.setVisible(false);
             edit.setVisible(false);
@@ -192,6 +188,7 @@ public class DetailActivity extends OrangeThemeActivity {
     @OnClick(R.id.review_btn)
     public void reviewClick(View view){
         Intent reviewIntent = new Intent(this, ReviewActivity.class);
+        reviewIntent.putExtra("storeId", storeId);
         startActivity(reviewIntent);
     }
     @OnClick(R.id.booking)
@@ -200,7 +197,7 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
     private void reserve(){
-        Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeID);
+        Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
 
         reserveCall.enqueue(new Callback<BaseModel>() {
             @Override
@@ -220,7 +217,7 @@ public class DetailActivity extends OrangeThemeActivity {
 
     private void bookmark(){
 
-        Call<BaseModel> bookmarkCall = networkService.userBookmark(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeID);
+        Call<BaseModel> bookmarkCall = networkService.userBookmark(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
 
         bookmarkCall.enqueue(new Callback<BaseModel>() {
             @Override

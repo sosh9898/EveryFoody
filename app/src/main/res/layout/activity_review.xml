@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
     tools:context=".ui.detail.review.ReviewActivity">
 
 
@@ -32,6 +30,9 @@
         android:id="@+id/review_rcv"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_above="@+id/comment_item"
+        android:layout_below="@+id/review_toolbar"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
         tools:listitem="@layout/layout_review_rcv_item">
 
@@ -45,25 +46,27 @@
         android:background="@color/colorComment"
         android:orientation="horizontal">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="2dp"
+            android:src="@drawable/camera" />
+
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_margin="5dp"
             android:background="@color/colorPrimary">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/camera" />
 
             <EditText
                 android:id="@+id/comment_edit"
-                android:layout_width="300dp"
+                android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:paddingLeft="13dp"
+                android:paddingLeft="2dp"
                 android:paddingTop="6dp"
                 android:textSize="15sp" />
         </FrameLayout>
@@ -76,10 +79,10 @@
             android:layout_marginTop="5dp"
             android:background="@drawable/comment_background"
             android:text="등록"
-            android:textColor="#fff" />
+            android:textColor="@color/colorPrimary" />
 
 
     </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>
