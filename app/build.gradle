@@ -37,6 +37,9 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.google.android.gms:play-services-maps:11.0.2'
     compile 'com.google.android.gms:play-services-location:11.0.2'
+    compile 'gun0912.ted:tedpermission:2.0.3'
+    compile 'gun0912.ted:tedbottompicker:1.0.12'
+    compile 'com.github.yalantis:ucrop:2.2.1'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

@@ -6,11 +6,15 @@ import dct.com.everyfoody.model.MainList;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.model.StoreInfo;
 import dct.com.everyfoody.model.UserInfo;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 /**
@@ -47,4 +51,12 @@ public interface NetworkService {
     @GET("/review/lists/{storeID}")
     Call<ResReview> getReviewList(@Header("token") String token, @Path("storeID") int storeId);
 
+    //리뷰 등록
+    @Multipart
+    @POST("/review/registration")
+    Call<BaseModel> registerReview(@Header("token") String token,
+                                   @Part MultipartBody.Part files,
+                                    @Part("storeID") RequestBody storeId,
+                                    @Part("score") RequestBody score,
+                                    @Part("content") RequestBody content);
 }
