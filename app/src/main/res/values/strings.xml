@@ -7,4 +7,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="kakao_app_key">82ac84ef3a7be61f9632aa032a49b569</string>
 </resources>

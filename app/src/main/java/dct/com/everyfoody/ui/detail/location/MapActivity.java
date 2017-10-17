@@ -28,8 +28,8 @@ import dct.com.everyfoody.base.WhiteThemeActivity;
 public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallback {
     @BindView(R.id.map_toolbar)Toolbar mapToolbar;
 
-    final static double mLatitude = 37.5197889;   //위도
-    final static double mLongitude = 126.9403083;  //경도
+    public static final double mLatitude = 37.5197889;   //위도
+    public static final double mLongitude = 126.9403083;  //경도
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
