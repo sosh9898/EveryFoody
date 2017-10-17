@@ -46,5 +46,4 @@ public interface NetworkService {
     //리뷰 리스트
     @GET("/review/lists/{storeID}")
     Call<ResReview> getReviewList(@Header("token") String token, @Path("storeID") int storeId);
-
 }

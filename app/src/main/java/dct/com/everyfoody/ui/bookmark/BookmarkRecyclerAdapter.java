@@ -74,7 +74,5 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
             foodTruckDistance.setText(truckList.getStoreDistance()+"");
             foodTruckBookerCount.setText(truckList.getReservationCount()+"");
         }
-
-
     }
 }
