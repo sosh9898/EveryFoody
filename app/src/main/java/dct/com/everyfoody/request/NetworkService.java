@@ -42,4 +42,6 @@ public interface NetworkService {
     @GET("/bookmark/lists/{latitude}/{longitude}")
     Call<MainList> getBookmarkList(@Header("token") String token, @Path("latitude") int lat, @Path("longitude") int log);
 
+
+
 }
