@@ -79,8 +79,7 @@ public class DetailActivity extends OrangeThemeActivity {
                         setToolbar();
                         Gson gson = new Gson();
                         String info = gson.toJson(storeInfo);
-                        bookmarkFlag = storeInfo.getDetailInfo().getBasicInfo().getReservationCheck();
-                        Log.d("fff", bookmarkFlag+"");
+                        bookmarkFlag = storeInfo.getDetailInfo().getBasicInfo().getBookmarkCheck();
                         addFragment(NormalFragment.getInstance(), BundleBuilder.create().with("storeInfo",info).build());
                     }
 

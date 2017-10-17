@@ -38,16 +38,16 @@ public class BookmarkActivity extends WhiteThemeActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bookmark);
         ButterKnife.bind(this);
+        networkService = ApplicationController.getInstance().getNetworkService();
+        SharedPreferencesService.getInstance().load(this);
         setToolbar();
-        getBookmarkList();
         setRecycler();
+        getBookmarkList();
 
 
     }
 
     private void getBookmarkList() {
-        networkService = ApplicationController.getInstance().getNetworkService();
-
         Call<MainList> bookmarkListCall = networkService.getBookmarkList(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), 44, 44);
 
         bookmarkListCall.enqueue(new Callback<MainList>() {
@@ -55,7 +55,6 @@ public class BookmarkActivity extends WhiteThemeActivity {
             public void onResponse(Call<MainList> call, Response<MainList> response) {
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equals("success")) {
-                        bookmarkList = new ArrayList<MainList.TruckList>();
                         bookmarkList = response.body().getTruckLists();
                         bookmarkRecyclerAdapter.refreshAdapter(bookmarkList);
 
@@ -72,6 +71,7 @@ public class BookmarkActivity extends WhiteThemeActivity {
     }
 
     private void setRecycler() {
+        bookmarkList = new ArrayList<MainList.TruckList>();
         bookmarkRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         bookmarkRecyclerAdapter = new BookmarkRecyclerAdapter(bookmarkList, onClickListener);
         bookmarkRecycler.setAdapter(bookmarkRecyclerAdapter);

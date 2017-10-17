@@ -1,4 +1,4 @@
-package dct.com.everyfoody.ui.bookmark;
+package dct.com.everyfoody.ui.detail.review;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,16 +20,15 @@ import dct.com.everyfoody.model.MainList;
  * Created by jyoung on 2017. 10. 4..
  */
 
-public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
+public class ReviewRecyclerAdapter extends RecyclerView.Adapter {
     private List<MainList.TruckList> bookmarkList;
     private View.OnClickListener onClickListener;
 
     public void refreshAdapter(List<MainList.TruckList> bookmarkList){
         this.bookmarkList = bookmarkList;
-        notifyDataSetChanged();
     }
 
-    public BookmarkRecyclerAdapter(List<MainList.TruckList> bookmarkList, View.OnClickListener onClickListener) {
+    public ReviewRecyclerAdapter(List<MainList.TruckList> bookmarkList, View.OnClickListener onClickListener) {
         this.bookmarkList = bookmarkList;
         this.onClickListener = onClickListener;
     }
@@ -74,5 +73,7 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
             foodTruckDistance.setText(truckList.getStoreDistance()+"");
             foodTruckBookerCount.setText(truckList.getReservationCount()+"");
         }
+
+
     }
 }

@@ -64,6 +64,17 @@ public class StoreInfo extends BaseModel {
         @SerializedName("reservationCheck")
         @Expose
         private Integer reservationCheck;
+        @SerializedName("bookmarkCheck")
+        @Expose
+        private Integer bookmarkCheck;
+
+        public Integer getBookmarkCheck() {
+            return bookmarkCheck;
+        }
+
+        public void setBookmarkCheck(Integer bookmarkCheck) {
+            this.bookmarkCheck = bookmarkCheck;
+        }
 
         public Integer getStoreID() {
             return storeID;
