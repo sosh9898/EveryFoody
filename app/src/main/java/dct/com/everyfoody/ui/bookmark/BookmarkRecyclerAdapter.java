@@ -26,9 +26,10 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
 
     public void refreshAdapter(List<MainList.TruckList> bookmarkList){
         this.bookmarkList = bookmarkList;
+        notifyDataSetChanged();
     }
 
-    public BookmarkRecyclerAdapter(List<MainList.TruckList> truckLists, View.OnClickListener onClickListener) {
+    public BookmarkRecyclerAdapter(List<MainList.TruckList> bookmarkList, View.OnClickListener onClickListener) {
         this.bookmarkList = bookmarkList;
         this.onClickListener = onClickListener;
     }
