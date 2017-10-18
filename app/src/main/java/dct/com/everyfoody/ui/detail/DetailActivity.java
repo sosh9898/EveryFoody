@@ -131,6 +131,7 @@ public class DetailActivity extends OrangeThemeActivity {
 
         if(id == R.id.menu_detail_map){
             Intent mapIntent = new Intent(this, MapActivity.class);
+            mapIntent.putExtra("storeId", storeId);
             startActivity(mapIntent);
         }
         else if(id == R.id.menu_detail_bookmark_on || id == R.id.menu_detail_bookmark_off){

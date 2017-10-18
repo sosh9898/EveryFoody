@@ -1,5 +1,6 @@
 package dct.com.everyfoody.ui.detail.location;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,20 +25,55 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.SharedPreferencesService;
+import dct.com.everyfoody.global.ApplicationController;
+import dct.com.everyfoody.model.ResLocation;
+import dct.com.everyfoody.request.NetworkService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallback {
     @BindView(R.id.map_toolbar)Toolbar mapToolbar;
 
-    public static final double mLatitude = 37.5197889;   //위도
-    public static final double mLongitude = 126.9403083;  //경도
+    private NetworkService networkService;
+    private double mLatitude, mLongitude;
+    private int storeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
-        setMap();
+        networkService = ApplicationController.getInstance().getNetworkService();
+        SharedPreferencesService.getInstance().load(this);
+        Intent getId = getIntent();
+        storeId = getId.getExtras().getInt("storeId");
         setToolbar();
+        getLocation();
+    }
+
+    private void getLocation(){
+        Call<ResLocation> locationCall = networkService.getLocation(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
+
+        locationCall.enqueue(new Callback<ResLocation>() {
+            @Override
+            public void onResponse(Call<ResLocation> call, Response<ResLocation> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().equals("success")){
+                        mLatitude = response.body().getLocation().getStoreLatitude();
+                        mLongitude = response.body().getLocation().getStoreLongitude();
+
+                        setMap();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResLocation> call, Throwable t) {
+
+            }
+        });
     }
 
     private void setToolbar(){
