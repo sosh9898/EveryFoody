@@ -29,7 +29,7 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
     @BindView(R.id.toolbar_owner)
     Toolbar ownerToolbar;
 
-    private MainActivity.LoggedDrawer loggedDrawer;
+    private MainActivity.LoggedDrawer loggedDrawer;   
 
 
     @Override
