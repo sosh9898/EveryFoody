@@ -92,6 +92,7 @@ public class MainActivity extends WhiteThemeActivity {
         setToolbar();
         bindDrawerEvent();
         checkPermission();
+        outoLogin();
         MapClipDataHelper.initialize();
 
         mapClipTextViews = new TextView[MAP_CLIP_COUNT];
@@ -109,6 +110,7 @@ public class MainActivity extends WhiteThemeActivity {
     }
 
     private void setInitSetting() {
+        SharedPreferencesService.getInstance().load(this);
         networkService = ApplicationController.getInstance().getNetworkService();
         ViewCompat.setNestedScrollingEnabled(mainRecycler, false);
         truckLists = new ArrayList<>();
@@ -157,13 +159,13 @@ public class MainActivity extends WhiteThemeActivity {
                 startActivity(bookmark);
             }
         });
-//        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
-//                startActivity(reservationIntent);
-//            }
-//        });
+        loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
+                startActivity(reservationIntent);
+            }
+        });
 
         View.OnClickListener profileEditClickListener = new View.OnClickListener() {
             @Override
@@ -180,7 +182,6 @@ public class MainActivity extends WhiteThemeActivity {
         mainRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adapter = new TruckRecyclerAdapter(truckLists, onClickListener);
         mainRecycler.setAdapter(adapter);
-        Log.d("dd", "??");
 
     }
 
@@ -192,6 +193,27 @@ public class MainActivity extends WhiteThemeActivity {
                 this, drawerLayout, guestToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+    }
+
+    private void outoLogin() {
+        if (SharedPreferencesService.getInstance().getPrefStringData("auto_token") != null) {
+            drawerDefault.setVisibility(View.GONE);
+            drawerLogged.setVisibility(View.VISIBLE);
+
+            switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")) {
+                case RESULT_GUEST:
+                    loggedDrawer.orderNameTextView.setText("예약내역");
+                    loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
+                    break;
+
+                case LoginActivity.RESULT_OWNER:
+                    loggedDrawer.orderNameTextView.setText("순번내역");
+                    loggedDrawer.pushListTextView.setText("가게 푸시알람");
+                    break;
+
+                default:
+            }
+        }
     }
 
     private void getMainData(int index) {
@@ -307,6 +329,27 @@ public class MainActivity extends WhiteThemeActivity {
         }
     };
 
+    private void loginSuccess(Intent data){
+        drawerDefault.setVisibility(View.GONE);
+        drawerLogged.setVisibility(View.VISIBLE);
+
+        int loginResult = data.getIntExtra(LoginActivity.LOGIN_RESULT, -1);
+
+        switch (loginResult) {
+            case RESULT_GUEST:
+                loggedDrawer.orderNameTextView.setText("예약내역");
+                loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
+                break;
+
+            case LoginActivity.RESULT_OWNER:
+                loggedDrawer.orderNameTextView.setText("순번내역");
+                loggedDrawer.pushListTextView.setText("가게 푸시알람");
+                break;
+
+            default:
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -315,31 +358,11 @@ public class MainActivity extends WhiteThemeActivity {
             case REQUEST_CODE_FOR_LOGIN:
                 if (resultCode == RESULT_OK) {
                     //로그인 성공
-                    drawerDefault.setVisibility(View.GONE);
-                    drawerLogged.setVisibility(View.VISIBLE);
-
-                    int loginResult = data.getIntExtra(LoginActivity.LOGIN_RESULT, -1);
-
-                    switch (loginResult) {
-                        case RESULT_GUEST:
-                            loggedDrawer.orderNameTextView.setText("예약내역");
-                            loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
-                            break;
-
-                        case LoginActivity.RESULT_OWNER:
-                            loggedDrawer.orderNameTextView.setText("순번내역");
-                            loggedDrawer.pushListTextView.setText("가게 푸시알람");
-                            break;
-
-                        default:
-
-                    }
-
+                    loginSuccess(data);
                 } else {
                     //로그인 실패
                 }
                 break;
-
             case REQUEST_CODE_FOR_SIGNUP:
                 if (resultCode == RESULT_OK) {
                     //회원가입 성공
@@ -374,6 +397,8 @@ public class MainActivity extends WhiteThemeActivity {
         ImageView profileEditImageView;
         @BindView(R.id.push_alarm_list_text)
         TextView pushListTextView;
+        @BindView(R.id.user_setting_rcv)
+        RecyclerView settingRecycler;
 
     }
 
@@ -381,8 +406,8 @@ public class MainActivity extends WhiteThemeActivity {
     public void bookmarkCountClick(View view){
         switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
             case RESULT_GUEST:
-                Intent reservationIntent = new Intent(MainActivity.this, ReservationActivity.class);
-                startActivity(reservationIntent);
+                Intent bookmarkIntent = new Intent(MainActivity.this, ReservationActivity.class);
+                startActivity(bookmarkIntent);
                 break;
             case RESULT_OWNER:
                 break;
@@ -391,9 +416,11 @@ public class MainActivity extends WhiteThemeActivity {
 
     @OnClick(R.id.order_count)
     public void orderCountClick(View view){
+        Log.d("butddd", "??");
         switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
             case RESULT_GUEST:
-
+                Intent reservationIntent = new Intent(this, ReservationActivity.class);
+                startActivity(reservationIntent);
                 break;
             case RESULT_OWNER:
                 break;

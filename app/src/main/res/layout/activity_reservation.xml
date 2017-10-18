@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context="dct.com.everyfoody.ui.reservation.ReservationActivity">
 
     <android.support.v7.widget.Toolbar
@@ -15,22 +15,22 @@
         android:background="?attr/colorPrimary">
 
         <TextView
-            android:layout_gravity="center"
-            android:text = "즐겨찾기"
-            android:textSize="16sp"
-            android:textColor="@color/colorAccent"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="예약내역"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
     </android.support.v7.widget.Toolbar>
 
 
     <android.support.v7.widget.RecyclerView
-        android:layout_marginTop="20dp"
         android:id="@+id/reservation_rcv"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
         tools:listitem="@layout/layout_reservation_rcv_item"></android.support.v7.widget.RecyclerView>
 
 </LinearLayout>
