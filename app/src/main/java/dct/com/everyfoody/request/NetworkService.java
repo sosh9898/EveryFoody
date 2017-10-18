@@ -4,6 +4,7 @@ import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.MainList;
 import dct.com.everyfoody.model.ResReview;
+import dct.com.everyfoody.model.Reservation;
 import dct.com.everyfoody.model.StoreInfo;
 import dct.com.everyfoody.model.UserInfo;
 import okhttp3.MultipartBody;
@@ -38,6 +39,10 @@ public interface NetworkService {
     //예약하기
     @GET("/reservation/compilation/{storeID}")
     Call<BaseModel> userReseve(@Header("token") String token, @Path("storeID") int storeId);
+
+    //예약 내역
+    @GET("/reservation/lists")
+    Call<Reservation> getReservationList(@Header("token") String token);
 
     //즐겨찾기
     @GET("/bookmark/compilation/{storeID}")

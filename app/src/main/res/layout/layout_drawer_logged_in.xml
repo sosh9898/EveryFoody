@@ -68,8 +68,8 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorAccent"
                 android:textSize="45sp"
+                android:layout_marginTop="34dp"
                 android:text="3"
-                android:layout_alignParentBottom="true"
                 android:layout_toLeftOf="@+id/bookmark_count"
                 android:layout_toStartOf="@+id/bookmark_count" />
 
@@ -139,6 +139,7 @@
             android:textStyle="bold" />
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/user_setting_rcv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/logout_btn"

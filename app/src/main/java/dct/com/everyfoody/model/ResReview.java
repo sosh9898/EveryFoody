@@ -30,7 +30,7 @@ public class ResReview extends BaseModel {
         @SerializedName("storeID")
         @Expose
         private Integer storeID;
-        @SerializedName("reviewes")
+        @SerializedName("reviews")
         @Expose
         private List<Review> reviews = null;
 
