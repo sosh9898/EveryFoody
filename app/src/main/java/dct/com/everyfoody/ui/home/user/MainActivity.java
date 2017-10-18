@@ -28,7 +28,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
@@ -38,6 +37,7 @@ import dct.com.everyfoody.request.NetworkService;
 import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.detail.DetailActivity;
 import dct.com.everyfoody.ui.home.MapClipDataHelper;
+import dct.com.everyfoody.ui.home.owner.OwnerHomeActivity;
 import dct.com.everyfoody.ui.login.LoginActivity;
 import dct.com.everyfoody.ui.reservation.ReservationActivity;
 import dct.com.everyfoody.ui.signup.SignUpMainActivity;
@@ -45,7 +45,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
 
 
@@ -148,8 +150,9 @@ public class MainActivity extends WhiteThemeActivity {
         loggedDrawer.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "로그아웃 구현해야함~", Toast.LENGTH_SHORT).show();
-                //로그아웃
+                SharedPreferencesService.getInstance().removeData("auth_token");
+                drawerDefault.setVisibility(View.VISIBLE);
+                drawerLogged.setVisibility(View.GONE);
             }
         });
         loggedDrawer.bookMarkCountTextView.setOnClickListener(new View.OnClickListener() {
@@ -196,23 +199,12 @@ public class MainActivity extends WhiteThemeActivity {
     }
 
     private void outoLogin() {
-        if (SharedPreferencesService.getInstance().getPrefStringData("auto_token") != null) {
+        if (!SharedPreferencesService.getInstance().getPrefStringData("auto_token").equals("")) {
             drawerDefault.setVisibility(View.GONE);
             drawerLogged.setVisibility(View.VISIBLE);
 
-            switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")) {
-                case RESULT_GUEST:
-                    loggedDrawer.orderNameTextView.setText("예약내역");
-                    loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
-                    break;
-
-                case LoginActivity.RESULT_OWNER:
-                    loggedDrawer.orderNameTextView.setText("순번내역");
-                    loggedDrawer.pushListTextView.setText("가게 푸시알람");
-                    break;
-
-                default:
-            }
+            loggedDrawer.orderNameTextView.setText("예약내역");
+            loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
         }
     }
 
@@ -337,17 +329,14 @@ public class MainActivity extends WhiteThemeActivity {
 
         switch (loginResult) {
             case RESULT_GUEST:
-                loggedDrawer.orderNameTextView.setText("예약내역");
-                loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
+            loggedDrawer.orderNameTextView.setText("예약내역");
+            loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
                 break;
-
-            case LoginActivity.RESULT_OWNER:
-                loggedDrawer.orderNameTextView.setText("순번내역");
-                loggedDrawer.pushListTextView.setText("가게 푸시알람");
-                break;
-
-            default:
+            case RESULT_OWNER:case RESULT_NON_AUTH_OWNER:case EXPIRED_OWNER:
+                Intent ownerIntent = new Intent(this, OwnerHomeActivity.class);
+                startActivity(ownerIntent);
         }
+
     }
 
     @Override
@@ -382,49 +371,23 @@ public class MainActivity extends WhiteThemeActivity {
         TextView pleaseLoginTextView;
     }
 
-    static class LoggedDrawer {
+    public static class LoggedDrawer {
         @BindView(R.id.profile_image)
-        ImageView profileImageView;
+        public ImageView profileImageView;
         @BindView(R.id.order_count)
-        TextView orderCountTextView;
+        public TextView orderCountTextView;
         @BindView(R.id.order_name_text)
-        TextView orderNameTextView;
+        public TextView orderNameTextView;
         @BindView(R.id.bookmark_count)
-        TextView bookMarkCountTextView;
+        public TextView bookMarkCountTextView;
         @BindView(R.id.logout_btn)
-        Button logoutButton;
+        public Button logoutButton;
         @BindView(R.id.profile_edit_btn)
-        ImageView profileEditImageView;
+        public ImageView profileEditImageView;
         @BindView(R.id.push_alarm_list_text)
-        TextView pushListTextView;
+        public TextView pushListTextView;
         @BindView(R.id.user_setting_rcv)
-        RecyclerView settingRecycler;
-
-    }
-
-    @OnClick(R.id.bookmark_count)
-    public void bookmarkCountClick(View view){
-        switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
-            case RESULT_GUEST:
-                Intent bookmarkIntent = new Intent(MainActivity.this, ReservationActivity.class);
-                startActivity(bookmarkIntent);
-                break;
-            case RESULT_OWNER:
-                break;
-        }
-    }
-
-    @OnClick(R.id.order_count)
-    public void orderCountClick(View view){
-        Log.d("butddd", "??");
-        switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
-            case RESULT_GUEST:
-                Intent reservationIntent = new Intent(this, ReservationActivity.class);
-                startActivity(reservationIntent);
-                break;
-            case RESULT_OWNER:
-                break;
-        }
+        public RecyclerView settingRecycler;
     }
 
     private void checkPermission(){
@@ -446,7 +409,4 @@ public class MainActivity extends WhiteThemeActivity {
                 .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
-
-
-
 }
