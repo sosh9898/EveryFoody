@@ -26,6 +26,9 @@ public class LoginActivity extends WhiteThemeActivity {
     public static final int RESULT_NON_AUTH_OWNER = 403;  // 미인증 사업자
     public static final int EXPIRED_OWNER = 404;          // 만료된 사업
 
+    public static final int LOGIN_KAKAO = 101;
+    public static final int LOGIN_FACEBOOK = 102;
+
     private NetworkService networkService;
 
     @Override
@@ -39,12 +42,54 @@ public class LoginActivity extends WhiteThemeActivity {
 
     }
 
+    @OnClick(R.id.facebook_login_btn)
+    public void facebookLoginClick(View view){
+        UserInfo userInfo = new UserInfo();
+        userInfo.setEmail("owner5");
+        userInfo.setUid("111");
+        userInfo.setCategory(LOGIN_KAKAO);
+
+        Call<Login> loginCall2 = networkService.userLogin(userInfo);
+
+        loginCall2.enqueue(new Callback<Login>() {
+            @Override
+            public void onResponse(Call<Login> call, Response<Login> response) {
+                if(response.isSuccessful()){
+                    SharedPreferencesService.getInstance().setPrefData("auth_token", response.body().getResultData().getToken());
+                    SharedPreferencesService.getInstance().setPrefData("user_name", response.body().getResultData().getName());
+                    int userStatus = response.body().getResultData().getCategory();
+
+                    Intent loginResult = new Intent();
+                    Log.d("?????", userStatus+"");
+                    if(userStatus == RESULT_GUEST) {
+                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
+                        loginResult.putExtra(LOGIN_RESULT, userStatus);
+                        setResult(RESULT_OK, loginResult);
+                        finish();
+                    }
+                    else{
+                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
+                        loginResult.putExtra(LOGIN_RESULT, userStatus);
+                        setResult(RESULT_OK, loginResult);
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Login> call, Throwable t) {
+                Log.d("sdfsdf", t.toString());
+            }
+        });
+
+    }
+
     @OnClick(R.id.kakao_login_btn)
     public void kakaoLoginClick(View view){
         UserInfo userInfo = new UserInfo();
         userInfo.setEmail("test1");
         userInfo.setUid("111");
-        userInfo.setCategory(1);
+        userInfo.setCategory(LOGIN_KAKAO);
 
         Call<Login> loginCall = networkService.userLogin(userInfo);
 
@@ -52,13 +97,23 @@ public class LoginActivity extends WhiteThemeActivity {
             @Override
             public void onResponse(Call<Login> call, Response<Login> response) {
                 if(response.isSuccessful()){
-                    SharedPreferencesService.getInstance().setPrefData("user_status", RESULT_GUEST);
                     SharedPreferencesService.getInstance().setPrefData("auth_token", response.body().getResultData().getToken());
                     SharedPreferencesService.getInstance().setPrefData("user_name", response.body().getResultData().getName());
+                    int userStatus = response.body().getResultData().getCategory();
+
                     Intent loginResult = new Intent();
-                    loginResult.putExtra(LOGIN_RESULT, RESULT_GUEST);
-                    setResult(RESULT_OK, loginResult);
-                    finish();
+                    if(userStatus == RESULT_GUEST) {
+                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
+                        loginResult.putExtra(LOGIN_RESULT, userStatus);
+                        setResult(RESULT_OK, loginResult);
+                        finish();
+                    }
+                    else{
+                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
+                        loginResult.putExtra(LOGIN_RESULT, userStatus);
+                        setResult(RESULT_OK, loginResult);
+                        finish();
+                    }
                 }
             }
 
