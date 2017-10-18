@@ -3,6 +3,7 @@ package dct.com.everyfoody.request;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.model.ResLocation;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.model.Reservation;
 import dct.com.everyfoody.model.StoreInfo;
@@ -64,4 +65,8 @@ public interface NetworkService {
                                     @Part("storeID") RequestBody storeId,
                                     @Part("score") RequestBody score,
                                     @Part("content") RequestBody content);
+
+    //가게 위치
+    @GET("/store/location/{storeID}")
+    Call<ResLocation> getLocation(@Header("token") String token, @Path("storeID") int storeId);
 }
