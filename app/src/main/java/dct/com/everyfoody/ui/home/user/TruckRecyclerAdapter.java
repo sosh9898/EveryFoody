@@ -26,6 +26,7 @@ public class TruckRecyclerAdapter extends RecyclerView.Adapter {
 
     public void refreshAdapter(List<MainList.TruckList> truckLists){
         this.truckLists = truckLists;
+        notifyDataSetChanged();
     }
 
     public TruckRecyclerAdapter(List<MainList.TruckList> truckLists, View.OnClickListener onClickListener) {

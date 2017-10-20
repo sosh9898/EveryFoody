@@ -36,12 +36,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
 
 public class DetailActivity extends OrangeThemeActivity {
-    @BindView(R.id.detail_toolbar)Toolbar detailToolbar;
-    @BindView(R.id.detail_main_image)ImageView mainImage;
+    @BindView(R.id.detail_toolbar)
+    Toolbar detailToolbar;
+    @BindView(R.id.detail_main_image)
+    ImageView mainImage;
 
     public static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -49,38 +53,74 @@ public class DetailActivity extends OrangeThemeActivity {
     private NetworkService networkService;
     private StoreInfo storeInfo;
     private int bookmarkFlag;
+    private int userStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
-        SharedPreferencesService.getInstance().load(getApplicationContext());
-        getInitData();
-        getStoreInfo();
+        SharedPreferencesService.getInstance().load(this);
+        networkService = ApplicationController.getInstance().getNetworkService();
+
+        userStatus = SharedPreferencesService.getInstance().getPrefIntegerData("user_status");
+        switch (userStatus) {
+            case RESULT_GUEST:
+                getInitData();
+                getStoreInfo();
+                break;
+            case RESULT_OWNER:
+            case RESULT_NON_AUTH_OWNER:
+            case EXPIRED_OWNER:
+                getMyStoreInfo();
+                break;
+            default:
+                getInitData();
+                getStoreInfo();
+                break;
+        }
+
     }
 
-    private void getInitData(){
+    private void getMyStoreInfo() {
+        Call<StoreInfo> getMyStoreInfo = networkService.getMyStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
+
+        getMyStoreInfo.enqueue(new Callback<StoreInfo>() {
+            @Override
+            public void onResponse(Call<StoreInfo> call, Response<StoreInfo> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().equals("success")){
+                        storeInfo = response.body();
+                        networkAfter();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<StoreInfo> call, Throwable t) {
+                Log.d("??", t.toString());
+            }
+        });
+
+    }
+
+    private void getInitData() {
         Intent getData = getIntent();
         storeId = getData.getExtras().getInt("storeId");
         networkService = ApplicationController.getInstance().getNetworkService();
     }
 
-    private void getStoreInfo(){
+    private void getStoreInfo() {
         Call<StoreInfo> getStoreInfo = networkService.getStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
 
         getStoreInfo.enqueue(new Callback<StoreInfo>() {
             @Override
             public void onResponse(Call<StoreInfo> call, Response<StoreInfo> response) {
-                if(response.isSuccessful()){
-
-                    if(response.body().getStatus().equals("success")){
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus().equals("success")) {
                         storeInfo = response.body();
-                        setToolbar();
-                        Gson gson = new Gson();
-                        String info = gson.toJson(storeInfo);
+                        networkAfter();
                         bookmarkFlag = storeInfo.getDetailInfo().getBasicInfo().getBookmarkCheck();
-                        addFragment(NormalFragment.getInstance(), BundleBuilder.create().with("storeInfo",info).build());
                     }
 
                 }
@@ -88,13 +128,20 @@ public class DetailActivity extends OrangeThemeActivity {
 
             @Override
             public void onFailure(Call<StoreInfo> call, Throwable t) {
-                Log.d(TAG, "error : "+t.toString());
+                Log.d(TAG, "error : " + t.toString());
             }
         });
 
     }
 
-    private void setToolbar(){
+    private void networkAfter() {
+        setToolbar();
+        Gson gson = new Gson();
+        String info = gson.toJson(storeInfo);
+        addFragment(NormalFragment.getInstance(), BundleBuilder.create().with("storeInfo", info).build());
+    }
+
+    private void setToolbar() {
         Glide.with(this).load(storeInfo.getDetailInfo().getBasicInfo().getStoreImage()).into(mainImage);
         detailToolbar.setTitle(storeInfo.getDetailInfo().getBasicInfo().getStoreName());
         detailToolbar.setTitleTextColor(getResources().getColor(R.color.colorPrimary));
@@ -109,7 +156,7 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
 
-    public void addFragment(Fragment fragment, Bundle bundle){
+    public void addFragment(Fragment fragment, Bundle bundle) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         fragment.setArguments(bundle);
@@ -129,21 +176,18 @@ public class DetailActivity extends OrangeThemeActivity {
         int id = item.getItemId();
 
 
-        if(id == R.id.menu_detail_map){
+        if (id == R.id.menu_detail_map) {
             Intent mapIntent = new Intent(this, MapActivity.class);
             mapIntent.putExtra("storeId", storeId);
             startActivity(mapIntent);
-        }
-        else if(id == R.id.menu_detail_bookmark_on || id == R.id.menu_detail_bookmark_off){
-            if(SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST){
+        } else if (id == R.id.menu_detail_bookmark_on || id == R.id.menu_detail_bookmark_off) {
+            if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST) {
                 Intent needLogin = new Intent(this, LoginActivity.class);
                 startActivity(needLogin);
-            }
-            else {
+            } else {
                 bookmark();
             }
-        }
-        else if(id == R.id.menu_detail_edit){
+        } else if (id == R.id.menu_detail_edit) {
             Intent editIntent = new Intent(this, EditActivity.class);
             startActivity(editIntent);
         }
@@ -159,25 +203,23 @@ public class DetailActivity extends OrangeThemeActivity {
         MenuItem bookmarkOff = menu.findItem(R.id.menu_detail_bookmark_off);
         MenuItem edit = menu.findItem(R.id.menu_detail_edit);
 
-        if(SharedPreferencesService.getInstance().getPrefIntegerData("user_status") ==RESULT_GUEST){
+        Log.d("??", SharedPreferencesService.getInstance().getPrefIntegerData("user_status") +"");
 
+
+        if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") == RESULT_GUEST) {
             edit.setVisible(false);
-            if(bookmarkFlag == 0){
+            if (bookmarkFlag == 0) {
                 bookmarkOn.setVisible(false);
                 bookmarkOff.setVisible(true);
-            }
-            else if(bookmarkFlag == 1){
+            } else if (bookmarkFlag == 1) {
                 bookmarkOn.setVisible(true);
                 bookmarkOff.setVisible(false);
             }
-        }
-        else if(SharedPreferencesService.getInstance().getPrefIntegerData("userStatus") == RESULT_OWNER){
-
+        } else if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") == RESULT_OWNER) {
             map.setVisible(false);
             bookmarkOff.setVisible(false);
             bookmarkOn.setVisible(false);
-        }
-        else{
+        } else {
 
             bookmarkOn.setVisible(false);
             edit.setVisible(false);
@@ -187,24 +229,25 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
     @OnClick(R.id.review_btn)
-    public void reviewClick(View view){
+    public void reviewClick(View view) {
         Intent reviewIntent = new Intent(this, ReviewActivity.class);
         reviewIntent.putExtra("storeId", storeId);
         startActivity(reviewIntent);
     }
+
     @OnClick(R.id.booking)
-    public void bookingClick(View view){
+    public void bookingClick(View view) {
         reserve();
     }
 
-    private void reserve(){
+    private void reserve() {
         Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
 
         reserveCall.enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getStatus().equals("success"))
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus().equals("success"))
                         ToastMaker.makeShortToast(getApplicationContext(), "성공");
                 }
             }
@@ -216,18 +259,18 @@ public class DetailActivity extends OrangeThemeActivity {
         });
     }
 
-    private void bookmark(){
+    private void bookmark() {
 
         Call<BaseModel> bookmarkCall = networkService.userBookmark(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
 
         bookmarkCall.enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getStatus().equals("success")) {
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus().equals("success")) {
                         ToastMaker.makeShortToast(getApplicationContext(), "성공");
 
-                        if(bookmarkFlag ==1)
+                        if (bookmarkFlag == 1)
                             bookmarkFlag = 0;
                         else
                             bookmarkFlag = 1;

@@ -13,10 +13,16 @@ import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
+import dct.com.everyfoody.global.ApplicationController;
+import dct.com.everyfoody.request.NetworkService;
 import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
+import dct.com.everyfoody.ui.detail.DetailActivity;
+import dct.com.everyfoody.ui.detail.location.MapActivity;
+import dct.com.everyfoody.ui.home.owner.turn.TurnActivity;
 import dct.com.everyfoody.ui.home.user.MainActivity;
 import dct.com.everyfoody.ui.reservation.ReservationActivity;
 
@@ -29,7 +35,9 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
     @BindView(R.id.toolbar_owner)
     Toolbar ownerToolbar;
 
-    private MainActivity.LoggedDrawer loggedDrawer;   
+    private MainActivity.LoggedDrawer loggedDrawer;
+    private NetworkService networkService;
+
 
 
     @Override
@@ -37,6 +45,8 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_owner_home);
         ButterKnife.bind(this);
+        networkService = ApplicationController.getInstance().getNetworkService();
+        SharedPreferencesService.getInstance().load(this);
         bindDrawerEvent();
         setToolbar();
     }
@@ -63,7 +73,7 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
         loggedDrawer.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesService.getInstance().removeData("auth_token");
+                SharedPreferencesService.getInstance().removeData("auth_token","user_status");
                 Intent defaultHome = new Intent(OwnerHomeActivity.this, MainActivity.class);
                 startActivity(defaultHome);
             }
@@ -139,5 +149,25 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
          */
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @OnClick(R.id.open_store)
+    public void onClickOpen(View view){
+       Intent openIntent = new Intent(this, MapActivity.class);
+        openIntent.putExtra("lat", 32.089);
+        openIntent.putExtra("lng",125.180);
+        startActivity(openIntent);
+    }
+
+    @OnClick(R.id.check_turn)
+    public void onClickCheckTurn(View view){
+        Intent turnIntent = new Intent(this, TurnActivity.class);
+        startActivity(turnIntent);
+    }
+
+    @OnClick(R.id.my_store)
+    public void onClickMyStoreInfo(View view){
+        Intent myStoreIntent = new Intent(this, DetailActivity.class);
+        startActivity(myStoreIntent);
     }
 }

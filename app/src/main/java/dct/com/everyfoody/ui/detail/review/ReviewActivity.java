@@ -11,8 +11,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.yalantis.ucrop.UCrop;
@@ -53,6 +55,8 @@ public class ReviewActivity extends WhiteThemeActivity {
     RecyclerView reviewRecycler;
     @BindView(R.id.comment_edit)
     EditText commentEdit;
+    @BindView(R.id.selected_image_preview)
+    ImageView previewImage;
 
     private ReviewRecyclerAdapter reviewRecyclerAdapter;
     private NetworkService networkService;
@@ -208,13 +212,16 @@ public class ReviewActivity extends WhiteThemeActivity {
 
     private void cropImage(Uri tempUri) {
         UCrop.Options options = new UCrop.Options();
-        options.setToolbarColor(getResources().getColor(R.color.colorPrimary));
-        options.setToolbarTitle("꿀팁 제조기");
-        options.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        options.setToolbarColor(getResources().getColor(R.color.colorAccent));
+        options.setToolbarTitle("사진 편집");
+        options.setStatusBarColor(getResources().getColor(R.color.colorAccent));
 
-        UCrop.of(tempUri, tempUri)
+        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), tempUri.toString().substring(tempUri.toString().lastIndexOf('/') + 1)));
+
+
+        UCrop.of(tempUri, mDestinationUri)
                 .withOptions(options)
-                .withAspectRatio(0, 0)
+                .withAspectRatio(2.8f, 1.1f)
                 .withMaxResultSize(maxWidth, maxHeight)
                 .start(this);
     }
@@ -225,9 +232,12 @@ public class ReviewActivity extends WhiteThemeActivity {
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             final Uri tempUri = UCrop.getOutput(data);
             resultUri = tempUri;
+            previewImage.setVisibility(View.VISIBLE);
+            Glide.with(previewImage.getContext())
+                    .load(resultUri)
+                    .into(previewImage);
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
         }
     }
-
 }

@@ -150,7 +150,7 @@ public class MainActivity extends WhiteThemeActivity {
         loggedDrawer.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesService.getInstance().removeData("auth_token");
+                SharedPreferencesService.getInstance().removeData("auth_token","user_status");
                 drawerDefault.setVisibility(View.VISIBLE);
                 drawerLogged.setVisibility(View.GONE);
             }
@@ -199,7 +199,7 @@ public class MainActivity extends WhiteThemeActivity {
     }
 
     private void outoLogin() {
-        if (!SharedPreferencesService.getInstance().getPrefStringData("auto_token").equals("")) {
+        if (!SharedPreferencesService.getInstance().getPrefStringData("auth_token").equals("")) {
             drawerDefault.setVisibility(View.GONE);
             drawerLogged.setVisibility(View.VISIBLE);
 
