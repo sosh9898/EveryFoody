@@ -3,10 +3,12 @@ package dct.com.everyfoody.request;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.model.OpenLocation;
 import dct.com.everyfoody.model.ResLocation;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.model.Reservation;
 import dct.com.everyfoody.model.StoreInfo;
+import dct.com.everyfoody.model.Turn;
 import dct.com.everyfoody.model.UserInfo;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -16,6 +18,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 
@@ -41,7 +44,7 @@ public interface NetworkService {
     @GET("/reservation/compilation/{storeID}")
     Call<BaseModel> userReseve(@Header("token") String token, @Path("storeID") int storeId);
 
-    //예약 내역
+    //예약 현황(이용자)
     @GET("/reservation/lists")
     Call<Reservation> getReservationList(@Header("token") String token);
 
@@ -69,4 +72,16 @@ public interface NetworkService {
     //가게 위치
     @GET("/store/location/{storeID}")
     Call<ResLocation> getLocation(@Header("token") String token, @Path("storeID") int storeId);
+
+    //가게 열기
+    @PUT("/management/registration/opening")
+    Call<BaseModel> openStore(@Header("token") String token, @Body OpenLocation openLocation);
+
+    //내 가게 정보
+    @GET("/management/myinfo/modification")
+    Call<StoreInfo> getMyStoreInfo(@Header("token") String token);
+
+    //예약 현황(사업자)
+    @GET("/management/customers/lists")
+    Call<Turn> getTurnList(@Header("token") String token);
 }

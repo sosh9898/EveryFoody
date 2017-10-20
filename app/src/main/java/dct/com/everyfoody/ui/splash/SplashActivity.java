@@ -11,7 +11,14 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.util.SharedPreferencesService;
+import dct.com.everyfoody.ui.home.owner.OwnerHomeActivity;
 import dct.com.everyfoody.ui.home.user.MainActivity;
+
+import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
 
 public class SplashActivity extends AppCompatActivity {
     @BindView(R.id.truck_image)ImageView truckImage;
@@ -22,6 +29,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
+        SharedPreferencesService.getInstance().load(this);
         setAnimation();
         appStart();
     }
@@ -33,7 +41,17 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 finish();
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
+                    case RESULT_GUEST:
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        break;
+                    case RESULT_OWNER:case RESULT_NON_AUTH_OWNER:case EXPIRED_OWNER:
+                        startActivity(new Intent(getApplicationContext(), OwnerHomeActivity.class));
+                        break;
+                    default:
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        break;
+                }
             }
         }, 1900);
     }
