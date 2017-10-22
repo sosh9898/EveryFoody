@@ -23,8 +23,8 @@ import dct.com.everyfoody.model.StoreInfo;
 public class MenuRecyclerAdapter extends RecyclerView.Adapter {
     private List<StoreInfo.MenuInfo> menuInfoList;
 
-    public void refreshAdapter(List<StoreInfo.MenuInfo> menuInfos) {
-        this.menuInfoList = menuInfoList;
+    public void refreshAdapter(List<StoreInfo.MenuInfo> menuInfo) {
+        this.menuInfoList = menuInfo;
     }
 
     public MenuRecyclerAdapter(List<StoreInfo.MenuInfo> menuInfoList) {

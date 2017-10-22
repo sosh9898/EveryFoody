@@ -6,24 +6,36 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+
+import dct.com.everyfoody.base.util.BundleBuilder;
+import dct.com.everyfoody.model.StoreInfo;
+
 /**
  * Created by jyoung on 2017. 8. 1..
  */
 
 public class EditPagerAdapter extends FragmentStatePagerAdapter {
-    SparseArray<Fragment> mainPager = new SparseArray<Fragment>();
+    private SparseArray<Fragment> mainPager = new SparseArray<Fragment>();
+    private StoreInfo storeInfo;
+    String basic , menu;
 
-    public EditPagerAdapter(FragmentManager fm) {
+    public EditPagerAdapter(FragmentManager fm, StoreInfo storeInfo) {
         super(fm);
+        storeInfo = storeInfo;
+        Gson gson = new Gson();
+        basic = gson.toJson(storeInfo.getDetailInfo().getBasicInfo());
+        menu = gson.toJson(storeInfo);
+
     }
 
     @Override
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return NormalEditFragment.getInstance();
+                return NormalEditFragment.getInstance(BundleBuilder.create().with("basic", basic).build());
             case 1:
-                return MenuEditFragment.getInstance();
+                return MenuEditFragment.getInstance(BundleBuilder.create().with("menu", menu).build());
         }
         return null;
     }

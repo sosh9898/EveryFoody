@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="dct.com.everyfoody">
 
+    <uses-sdk tools:overrideLibrary="gun0912.tedbottompicker" />
+
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <uses-sdk tools:overrideLibrary="gun0912.tedbottompicker"/>
     <application
         android:name=".global.ApplicationController"
         android:allowBackup="true"
@@ -45,26 +46,20 @@
         <activity android:name=".ui.reservation.ReservationActivity" />
         <activity android:name=".ui.home.owner.turn.TurnActivity" />
         <activity android:name=".ui.detail.review.ReviewActivity" />
-        <activity android:name=".ui.detail.location.MapActivity">
-
-        </activity>
+        <activity android:name=".ui.detail.location.MapActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD2gXcDAwK3hePZlnpWDp6XF9d76yZBTPM" />
-
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
 
         <activity android:name=".ui.detail.edit.EditActivity" />
-        <activity android:name=".ui.signup.owner.SignUpOwner2Activity"></activity>
-        <activity android:name=".ui.signup.user.SignUp2Activity">
-
-        </activity>
-        <activity android:name=".ui.bookmark.BookmarkActivity"/>
-
-
+        <activity android:name=".ui.signup.owner.SignUpOwner2Activity" />
+        <activity android:name=".ui.signup.user.SignUp2Activity"></activity>
+        <activity android:name=".ui.bookmark.BookmarkActivity" />
+        <activity android:name=".ui.detail.edit.EditMenuActivity"></activity>
     </application>
 
 </manifest>

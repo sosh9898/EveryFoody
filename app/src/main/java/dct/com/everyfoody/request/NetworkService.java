@@ -14,6 +14,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -84,4 +85,26 @@ public interface NetworkService {
     //예약 현황(사업자)
     @GET("/management/customers/lists")
     Call<Turn> getTurnList(@Header("token") String token);
+
+    //메뉴 추가
+    @Multipart
+    @PUT("/management/myinfo/menu/addition")
+    Call<BaseModel> registerMenu(@Header("token") String token,
+                                 @Part MultipartBody.Part file,
+                                 @Part("menu_name") RequestBody menuName,
+                                 @Part("menu_price") RequestBody menuPrice);
+
+    //메뉴 수정
+    @Multipart
+    @PUT("/management/myinfo/menu/modification/{menu_id}")
+    Call<BaseModel> editMenu(@Header("token") String token,
+                                 @Path("menu_id") int menuId,
+                                 @Part MultipartBody.Part file,
+                                 @Part("menu_name") RequestBody menuName,
+                                 @Part("menu_price") RequestBody menuPrice);
+
+    //메뉴 삭제
+    @DELETE("/management/myinfo/menu/remove/{menu_id}")
+    Call<BaseModel> deleteMenu(@Header("token") String token, @Path("menu_id") int menuId);
+    
 }
