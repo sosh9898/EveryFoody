@@ -13,6 +13,7 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:id="@+id/edit_operation_time"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="23dp"
@@ -31,13 +32,18 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:layout_marginLeft="23dp"
+
+            android:id="@+id/edit_break_time"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="23dp"
             android:background="@null"
             android:hint="브레이크타임 (선택사항)"
             android:textColorHint="@color/colorEditTextHint"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
@@ -49,6 +55,7 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:id="@+id/edit_phone_number"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="23dp"
@@ -67,6 +74,7 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:id="@+id/edit_hashtag"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="23dp"
@@ -85,6 +93,7 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:id="@+id/edit_facebook_url"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="23dp"
@@ -103,6 +112,7 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:id="@+id/edit_twitter_url"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="23dp"
@@ -121,6 +131,7 @@
         android:background="@drawable/edittext_base">
 
         <EditText
+            android:id="@+id/edit_instagram_url"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="23dp"

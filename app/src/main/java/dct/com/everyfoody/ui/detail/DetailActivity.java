@@ -122,7 +122,6 @@ public class DetailActivity extends OrangeThemeActivity {
                         networkAfter();
                         bookmarkFlag = storeInfo.getDetailInfo().getBasicInfo().getBookmarkCheck();
                     }
-
                 }
             }
 
@@ -189,6 +188,9 @@ public class DetailActivity extends OrangeThemeActivity {
             }
         } else if (id == R.id.menu_detail_edit) {
             Intent editIntent = new Intent(this, EditActivity.class);
+            Gson gson = new Gson();
+            String info = gson.toJson(storeInfo);
+            editIntent.putExtra("info", info);
             startActivity(editIntent);
         }
 
@@ -274,8 +276,8 @@ public class DetailActivity extends OrangeThemeActivity {
                             bookmarkFlag = 0;
                         else
                             bookmarkFlag = 1;
-                        supportInvalidateOptionsMenu();
 
+                        supportInvalidateOptionsMenu();
                     }
                 }
             }

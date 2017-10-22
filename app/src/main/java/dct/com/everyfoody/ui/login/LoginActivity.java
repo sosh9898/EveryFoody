@@ -87,7 +87,7 @@ public class LoginActivity extends WhiteThemeActivity {
     @OnClick(R.id.kakao_login_btn)
     public void kakaoLoginClick(View view){
         UserInfo userInfo = new UserInfo();
-        userInfo.setEmail("test1");
+        userInfo.setEmail("test2");
         userInfo.setUid("111");
         userInfo.setCategory(LOGIN_KAKAO);
 
