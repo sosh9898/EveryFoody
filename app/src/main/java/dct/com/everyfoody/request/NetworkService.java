@@ -7,6 +7,7 @@ import dct.com.everyfoody.model.OpenLocation;
 import dct.com.everyfoody.model.ResLocation;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.model.Reservation;
+import dct.com.everyfoody.model.SideMenu;
 import dct.com.everyfoody.model.StoreInfo;
 import dct.com.everyfoody.model.Turn;
 import dct.com.everyfoody.model.UserInfo;
@@ -106,5 +107,9 @@ public interface NetworkService {
     //메뉴 삭제
     @DELETE("/management/myinfo/menu/remove/{menu_id}")
     Call<BaseModel> deleteMenu(@Header("token") String token, @Path("menu_id") int menuId);
+
+    //사이드 메뉴(이용자)
+    @GET("/main/sidemenu/{user_status}")
+    Call<SideMenu> getSideMenuInfo(@Header("token") String token, @Path("user_status") int userStatus);
     
 }

@@ -5,11 +5,16 @@ import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -18,13 +23,15 @@ import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
+import dct.com.everyfoody.model.SideMenu;
 import dct.com.everyfoody.request.NetworkService;
-import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.detail.DetailActivity;
 import dct.com.everyfoody.ui.detail.location.MapActivity;
 import dct.com.everyfoody.ui.home.owner.turn.TurnActivity;
 import dct.com.everyfoody.ui.home.user.MainActivity;
-import dct.com.everyfoody.ui.reservation.ReservationActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class OwnerHomeActivity extends WhiteThemeActivity {
 
@@ -37,7 +44,8 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
 
     private MainActivity.LoggedDrawer loggedDrawer;
     private NetworkService networkService;
-
+    private OwnerSettingRecyclerAdapter settingAdapter;
+    private List<Integer> statusList;
 
 
     @Override
@@ -49,6 +57,16 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
         SharedPreferencesService.getInstance().load(this);
         bindDrawerEvent();
         setToolbar();
+        setRecycler();
+
+        Log.d("???", SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
+    }
+
+    private void setRecycler() {
+        statusList = new ArrayList<>();
+        loggedDrawer.settingRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        settingAdapter = new OwnerSettingRecyclerAdapter(statusList);
+        loggedDrawer.settingRecycler.setAdapter(settingAdapter);
     }
 
     private void setToolbar() {
@@ -56,7 +74,19 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
         setSupportActionBar(ownerToolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, ownerToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawerLayout, ownerToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                if (newState == DrawerLayout.STATE_SETTLING) {
+                    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    } else {
+                        openSideMenu();
+                    }
+                    invalidateOptionsMenu();
+                }
+            }
+
+        };
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
     }
@@ -73,23 +103,16 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
         loggedDrawer.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesService.getInstance().removeData("auth_token","user_status");
+                SharedPreferencesService.getInstance().removeData("auth_token", "user_status");
                 Intent defaultHome = new Intent(OwnerHomeActivity.this, MainActivity.class);
                 startActivity(defaultHome);
-            }
-        });
-        loggedDrawer.bookMarkCountTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent bookmark = new Intent(getApplicationContext(), BookmarkActivity.class);
-                startActivity(bookmark);
             }
         });
         loggedDrawer.orderCountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent reservationIntent = new Intent(OwnerHomeActivity.this, ReservationActivity.class);
-                startActivity(reservationIntent);
+                Intent turnIntent = new Intent(OwnerHomeActivity.this, TurnActivity.class);
+                startActivity(turnIntent);
             }
         });
 
@@ -152,22 +175,45 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
     }
 
     @OnClick(R.id.open_store)
-    public void onClickOpen(View view){
-       Intent openIntent = new Intent(this, MapActivity.class);
+    public void onClickOpen(View view) {
+        Intent openIntent = new Intent(this, MapActivity.class);
         openIntent.putExtra("lat", 32.089);
-        openIntent.putExtra("lng",125.180);
+        openIntent.putExtra("lng", 125.180);
         startActivity(openIntent);
     }
 
     @OnClick(R.id.check_turn)
-    public void onClickCheckTurn(View view){
+    public void onClickCheckTurn(View view) {
         Intent turnIntent = new Intent(this, TurnActivity.class);
         startActivity(turnIntent);
     }
 
     @OnClick(R.id.my_store)
-    public void onClickMyStoreInfo(View view){
+    public void onClickMyStoreInfo(View view) {
         Intent myStoreIntent = new Intent(this, DetailActivity.class);
         startActivity(myStoreIntent);
+    }
+
+    private void openSideMenu() {
+        Call<SideMenu> sideMenuCall = networkService.getSideMenuInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),
+                SharedPreferencesService.getInstance().getPrefIntegerData("user_status"));
+
+        sideMenuCall.enqueue(new Callback<SideMenu>() {
+            @Override
+            public void onResponse(Call<SideMenu> call, Response<SideMenu> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus().equals("success")) {
+                        loggedDrawer.bookMarkCountTextView.setText(response.body().getSideInfo().getBmNum() + "");
+                        loggedDrawer.orderCountTextView.setText(response.body().getSideInfo().getResNum() + "");
+                        settingAdapter.refreshAdapter(response.body().getSideInfo().getOwnerStatus());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SideMenu> call, Throwable t) {
+                Log.d("????", t.toString());
+            }
+        });
     }
 }

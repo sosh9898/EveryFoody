@@ -33,6 +33,7 @@ import dct.com.everyfoody.base.WhiteThemeActivity;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.model.SideMenu;
 import dct.com.everyfoody.request.NetworkService;
 import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.detail.DetailActivity;
@@ -56,6 +57,8 @@ public class MainActivity extends WhiteThemeActivity {
     private static final int MAP_CLIP_COUNT = 8;
     private static final int REQUEST_CODE_FOR_LOGIN = 201;
     private static final int REQUEST_CODE_FOR_SIGNUP = 202;
+    public static final int TOGGLE_CHECKED = 501;
+    public static final int TOGGLE_UNCHECKED = 502;
 
     @BindView(R.id.main_fab)
     FloatingActionButton fab;
@@ -75,6 +78,7 @@ public class MainActivity extends WhiteThemeActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
     private TruckRecyclerAdapter adapter;
+    private SettingRecyclerAdapter settingAdapter;
     private NetworkService networkService;
     private ImageView[] mapClipImageViews;
     private TextView[] mapClipTextViews;
@@ -83,6 +87,7 @@ public class MainActivity extends WhiteThemeActivity {
     private int lastClickedMapPosition = 3;
     private MainList mainList;
     private List<MainList.TruckList> truckLists;
+    private List<SideMenu.BookMark> bookMarkList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +100,10 @@ public class MainActivity extends WhiteThemeActivity {
         bindDrawerEvent();
         checkPermission();
         outoLogin();
+        setRecycler();
         MapClipDataHelper.initialize();
+
+        Log.d("????",SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
 
         mapClipTextViews = new TextView[MAP_CLIP_COUNT];
         mapClipImageViews = new ImageView[MAP_CLIP_COUNT];
@@ -116,6 +124,7 @@ public class MainActivity extends WhiteThemeActivity {
         networkService = ApplicationController.getInstance().getNetworkService();
         ViewCompat.setNestedScrollingEnabled(mainRecycler, false);
         truckLists = new ArrayList<>();
+        bookMarkList = new ArrayList<>();
     }
 
     private void bindDrawerEvent() {
@@ -150,7 +159,7 @@ public class MainActivity extends WhiteThemeActivity {
         loggedDrawer.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesService.getInstance().removeData("auth_token","user_status");
+                SharedPreferencesService.getInstance().removeData("auth_token", "user_status");
                 drawerDefault.setVisibility(View.VISIBLE);
                 drawerLogged.setVisibility(View.GONE);
             }
@@ -186,6 +195,11 @@ public class MainActivity extends WhiteThemeActivity {
         adapter = new TruckRecyclerAdapter(truckLists, onClickListener);
         mainRecycler.setAdapter(adapter);
 
+        loggedDrawer.settingRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        settingAdapter = new SettingRecyclerAdapter(bookMarkList);
+        loggedDrawer.settingRecycler.setAdapter(settingAdapter);
+
+
     }
 
     private void setToolbar() {
@@ -193,9 +207,22 @@ public class MainActivity extends WhiteThemeActivity {
         setSupportActionBar(guestToolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, guestToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawerLayout, guestToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                if (newState == DrawerLayout.STATE_SETTLING) {
+                    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    } else {
+                        openSideMenu();
+                    }
+                    invalidateOptionsMenu();
+                }
+            }
+        };
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+
+
     }
 
     private void outoLogin() {
@@ -218,7 +245,7 @@ public class MainActivity extends WhiteThemeActivity {
                     mainList = response.body();
                     if (mainList.getStatus().equals("success")) {
                         truckLists = mainList.getTruckLists();
-                        setRecycler();
+                        adapter.refreshAdapter(truckLists);
                     }
                 }
             }
@@ -321,7 +348,7 @@ public class MainActivity extends WhiteThemeActivity {
         }
     };
 
-    private void loginSuccess(Intent data){
+    private void loginSuccess(Intent data) {
         drawerDefault.setVisibility(View.GONE);
         drawerLogged.setVisibility(View.VISIBLE);
 
@@ -329,10 +356,12 @@ public class MainActivity extends WhiteThemeActivity {
 
         switch (loginResult) {
             case RESULT_GUEST:
-            loggedDrawer.orderNameTextView.setText("예약내역");
-            loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
+                loggedDrawer.orderNameTextView.setText("예약내역");
+                loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
                 break;
-            case RESULT_OWNER:case RESULT_NON_AUTH_OWNER:case EXPIRED_OWNER:
+            case RESULT_OWNER:
+            case RESULT_NON_AUTH_OWNER:
+            case EXPIRED_OWNER:
                 Intent ownerIntent = new Intent(this, OwnerHomeActivity.class);
                 startActivity(ownerIntent);
         }
@@ -390,7 +419,7 @@ public class MainActivity extends WhiteThemeActivity {
         public RecyclerView settingRecycler;
     }
 
-    private void checkPermission(){
+    private void checkPermission() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -408,5 +437,28 @@ public class MainActivity extends WhiteThemeActivity {
                 .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
                 .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
+    }
+
+    private void openSideMenu(){
+        Call<SideMenu> sideMenuCall = networkService.getSideMenuInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),
+                SharedPreferencesService.getInstance().getPrefIntegerData("user_status"));
+
+        sideMenuCall.enqueue(new Callback<SideMenu>() {
+            @Override
+            public void onResponse(Call<SideMenu> call, Response<SideMenu> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().equals("success")){
+                        loggedDrawer.bookMarkCountTextView.setText(response.body().getSideInfo().getBmNum()+"");
+                        loggedDrawer.orderCountTextView.setText(response.body().getSideInfo().getResNum()+"");
+                        settingAdapter.refreshAdapter(response.body().getSideInfo().getBookMarkList());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SideMenu> call, Throwable t) {
+                Log.d("????", t.toString());
+            }
+        });
     }
 }
