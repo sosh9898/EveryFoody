@@ -74,7 +74,6 @@ public class ReservationActivity extends WhiteThemeActivity {
                     if(response.body().getStatus().equals("success")){
                         reservationList = response.body().getStore();
                         reserveRecyclerAdapter.refreshAdapter(reservationList);
-                        Log.d("d???", response.body().getStatus() + response.body().getStore().get(0).getStoreName());
                     }
                 }
             }

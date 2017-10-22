@@ -61,13 +61,13 @@ public class TurnActivity extends AppCompatActivity {
                         turnInfoList = response.body().getTurnList();
                         turnRecyclerAdapter.refreshAdapter(turnInfoList);
                         ToastMaker.makeShortToast(getApplicationContext(), "성공");
+
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<Turn> call, Throwable t) {
-
             }
         });
     }
