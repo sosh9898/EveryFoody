@@ -1,6 +1,7 @@
 package dct.com.everyfoody.request;
 
 import dct.com.everyfoody.base.BaseModel;
+import dct.com.everyfoody.model.CheckId;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.MainList;
 import dct.com.everyfoody.model.OpenLocation;
@@ -33,6 +34,10 @@ public interface NetworkService {
     //로그인
     @POST("/signin")
     Call<Login> userLogin(@Body UserInfo userInfo);
+
+    //회원가입
+    @POST("/signup/customer")
+    Call<BaseModel> userSignUp(@Body UserInfo userInfo);
 
     //메인
     @GET("/main/lists/{location}/{latitude}/{longitude}")
@@ -87,6 +92,11 @@ public interface NetworkService {
     @GET("/management/customers/lists")
     Call<Turn> getTurnList(@Header("token") String token);
 
+    //가게 기본정보 수정
+    @POST("/management/myinfo/basic/modification")
+    Call<BaseModel> modifyBasicInfo(@Header("token") String token,
+                                    @Body StoreInfo.BasicInfo basicInfo);
+
     //메뉴 추가
     @Multipart
     @PUT("/management/myinfo/menu/addition")
@@ -108,8 +118,28 @@ public interface NetworkService {
     @DELETE("/management/myinfo/menu/remove/{menu_id}")
     Call<BaseModel> deleteMenu(@Header("token") String token, @Path("menu_id") int menuId);
 
-    //사이드 메뉴(이용자)
+    //사이드 메뉴
     @GET("/main/sidemenu/{user_status}")
     Call<SideMenu> getSideMenuInfo(@Header("token") String token, @Path("user_status") int userStatus);
-    
+
+    //토글 체크(이용자)
+    @PUT("/main/toggle/user/opening/{owner_id}")
+    Call<BaseModel> checkedToggle(@Header("token") String token, @Path("owner_id") int owner_id);
+
+    //토글 체크해제(이용자)
+    @PUT("/main/toggle/user/closing/{owner_id}")
+    Call<BaseModel> unCheckedToggle(@Header("token") String token, @Path("owner_id") int owner_id);
+
+    //토글 체크(사업자)
+    @PUT("/main/toggle/owner/opening/{kind}")
+    Call<BaseModel> checkedToggleOwner(@Header("token") String token, @Path("kind") int kind);
+
+    //토글 체크해제(사업자)
+    @PUT("/main/toggle/owner/closing/{kind}")
+    Call<BaseModel> unCheckedToggleOwner(@Header("token") String token, @Path("kind") int kind);
+
+    //아이디 체크
+    @GET("/signin/checking/{user_uid}")
+    Call<CheckId> checkId(@Path("user_uid") String uid);
+
 }

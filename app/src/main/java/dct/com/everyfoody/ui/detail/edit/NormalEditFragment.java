@@ -68,4 +68,16 @@ public class NormalEditFragment extends Fragment {
         twitterEdit.setText(basicInfo.getStoreTwitterURL());
         instagramEdit.setText(basicInfo.getStoreInstagramURL());
     }
+
+    public StoreInfo.BasicInfo getEditInfo(){
+        basicInfo.setStoreBreaktime(breakTiemEdit.getText().toString());
+        basicInfo.setStoreOpentime(operationEdit.getText().toString());
+        basicInfo.setStoreHashtag(hashtagEdit.getText().toString());
+        basicInfo.setStorePhone(phoneNumEdit.getText().toString());
+        basicInfo.setStoreFacebookURL(facebookEdit.getText().toString());
+        basicInfo.setStoreInstagramURL(instagramEdit.getText().toString());
+        basicInfo.setStoreTwitterURL(twitterEdit.getText().toString());
+
+        return basicInfo;
+    }
 }

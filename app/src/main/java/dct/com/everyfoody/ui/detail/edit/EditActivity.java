@@ -3,8 +3,10 @@ package dct.com.everyfoody.ui.detail.edit;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,8 +19,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.SharedPreferencesService;
+import dct.com.everyfoody.base.util.ToastMaker;
+import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.StoreInfo;
+import dct.com.everyfoody.request.NetworkService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EditActivity extends WhiteThemeActivity {
     @BindView(R.id.edit_toolbar)Toolbar editToolbar;
@@ -28,6 +38,7 @@ public class EditActivity extends WhiteThemeActivity {
 
     private EditPagerAdapter editPagerAdapter;
     private StoreInfo storeInfo;
+    private NetworkService networkService;
 
     public static final int MENU_EDIT = 501;
     public static final int MENU_ADD = 502;
@@ -37,6 +48,8 @@ public class EditActivity extends WhiteThemeActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
         ButterKnife.bind(this);
+        networkService = ApplicationController.getInstance().getNetworkService();
+        SharedPreferencesService.getInstance().load(this);
 
         getStoreInfo();
         setToolbar();
@@ -89,9 +102,32 @@ public class EditActivity extends WhiteThemeActivity {
         int id = item.getItemId();
 
         if(id == R.id.menu_complete){
-            /*TODO
-            서버로 정보 전송
-             */
+            Fragment fragment = editPagerAdapter.getRegisteredFragment(0);
+            storeInfo.getDetailInfo().setBasicInfo(((NormalEditFragment)fragment).getEditInfo());
+            Log.d("??",storeInfo.getDetailInfo().getBasicInfo().getStoreImage()
+            + storeInfo.getDetailInfo().getBasicInfo().getStoreBreaktime());
+
+
+
+            Call<BaseModel> basicEditCall = networkService.modifyBasicInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),
+                    storeInfo.getDetailInfo().getBasicInfo());
+
+            basicEditCall.enqueue(new Callback<BaseModel>() {
+                @Override
+                public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+                    if(response.isSuccessful()){
+                        if(response.body().getStatus().equals("success")){
+                            ToastMaker.makeShortToast(getApplicationContext(), "수정 성공");
+                            finish();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<BaseModel> call, Throwable t) {
+                    Log.d("??",t.toString());
+                }
+            });
         }
 
         return super.onOptionsItemSelected(item);
