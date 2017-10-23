@@ -5,6 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.Session;
+import com.kakao.usermgmt.LoginButton;
+import com.kakao.util.exception.KakaoException;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
@@ -14,11 +20,14 @@ import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.UserInfo;
 import dct.com.everyfoody.request.NetworkService;
+import dct.com.everyfoody.ui.signup.KakaoSignupActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends WhiteThemeActivity {
+    @BindView(R.id.kakao_signup)
+    LoginButton kakaoBtn;
 
     public static final String LOGIN_RESULT = "login-result-key";     //로그인 결과를 Intent로 보낼 때, IntExtra의 key값
     public static final int RESULT_GUEST = 401;     //value값1
@@ -30,6 +39,7 @@ public class LoginActivity extends WhiteThemeActivity {
     public static final int LOGIN_FACEBOOK = 102;
 
     private NetworkService networkService;
+    private SessionCallback callback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +52,27 @@ public class LoginActivity extends WhiteThemeActivity {
 
     }
 
+    protected void redirectSignupActivity() {
+
+        final Intent intent = new Intent(this, KakaoSignupActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+//            callbackManager.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+    }
+
     @OnClick(R.id.facebook_login_btn)
-    public void facebookLoginClick(View view){
+    public void facebookLoginClick(View view) {
         UserInfo userInfo = new UserInfo();
         userInfo.setEmail("owner5");
         userInfo.setUid("111");
@@ -54,20 +83,18 @@ public class LoginActivity extends WhiteThemeActivity {
         loginCall2.enqueue(new Callback<Login>() {
             @Override
             public void onResponse(Call<Login> call, Response<Login> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     SharedPreferencesService.getInstance().setPrefData("auth_token", response.body().getResultData().getToken());
                     SharedPreferencesService.getInstance().setPrefData("user_name", response.body().getResultData().getName());
                     int userStatus = response.body().getResultData().getCategory();
 
                     Intent loginResult = new Intent();
-                    Log.d("?????", userStatus+"");
-                    if(userStatus == RESULT_GUEST) {
+                    if (userStatus == RESULT_GUEST) {
                         SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
                         loginResult.putExtra(LOGIN_RESULT, userStatus);
                         setResult(RESULT_OK, loginResult);
                         finish();
-                    }
-                    else{
+                    } else {
                         SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
                         loginResult.putExtra(LOGIN_RESULT, userStatus);
                         setResult(RESULT_OK, loginResult);
@@ -85,44 +112,72 @@ public class LoginActivity extends WhiteThemeActivity {
     }
 
     @OnClick(R.id.kakao_login_btn)
-    public void kakaoLoginClick(View view){
-        UserInfo userInfo = new UserInfo();
-        userInfo.setEmail("test2");
-        userInfo.setUid("111");
-        userInfo.setCategory(LOGIN_KAKAO);
+    public void kakaoLoginClick(View view) {
 
-        Call<Login> loginCall = networkService.userLogin(userInfo);
+        callback = new SessionCallback();
+        Session.getCurrentSession().addCallback(callback);
+        kakaoBtn.performClick();
 
-        loginCall.enqueue(new Callback<Login>() {
-            @Override
-            public void onResponse(Call<Login> call, Response<Login> response) {
-                if(response.isSuccessful()){
-                    SharedPreferencesService.getInstance().setPrefData("auth_token", response.body().getResultData().getToken());
-                    SharedPreferencesService.getInstance().setPrefData("user_name", response.body().getResultData().getName());
-                    int userStatus = response.body().getResultData().getCategory();
 
-                    Intent loginResult = new Intent();
-                    if(userStatus == RESULT_GUEST) {
-                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
-                        loginResult.putExtra(LOGIN_RESULT, userStatus);
-                        setResult(RESULT_OK, loginResult);
-                        finish();
-                    }
-                    else{
-                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
-                        loginResult.putExtra(LOGIN_RESULT, userStatus);
-                        setResult(RESULT_OK, loginResult);
-                        finish();
-                    }
-                }
+//        UserInfo userInfo = new UserInfo();
+//        userInfo.setEmail("test2");
+//        userInfo.setUid("111");
+//        userInfo.setCategory(LOGIN_KAKAO);
+//
+//        Call<Login> loginCall = networkService.userLogin(userInfo);
+//
+//        loginCall.enqueue(new Callback<Login>() {
+//            @Override
+//            public void onResponse(Call<Login> call, Response<Login> response) {
+//                if (response.isSuccessful()) {
+//                    SharedPreferencesService.getInstance().setPrefData("auth_token", response.body().getResultData().getToken());
+//                    SharedPreferencesService.getInstance().setPrefData("user_name", response.body().getResultData().getName());
+//                    int userStatus = response.body().getResultData().getCategory();
+//
+//                    Intent loginResult = new Intent();
+//                    if (userStatus == RESULT_GUEST) {
+//                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
+//                        loginResult.putExtra(LOGIN_RESULT, userStatus);
+//                        setResult(RESULT_OK, loginResult);
+//                        finish();
+//                    } else {
+//                        SharedPreferencesService.getInstance().setPrefData("user_status", userStatus);
+//                        loginResult.putExtra(LOGIN_RESULT, userStatus);
+//                        setResult(RESULT_OK, loginResult);
+//                        finish();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Login> call, Throwable t) {
+//                Log.d("sdfsdf", t.toString());
+//            }
+//        });
+
+
+    }
+
+    public class SessionCallback implements ISessionCallback {
+
+
+        @Override
+        public void onSessionOpened() {
+            redirectSignupActivity();
+            Log.d("kakaokkkk", "?");
+
+        }
+
+        @Override
+        public void onSessionOpenFailed(KakaoException exception) {
+            Log.d("kakaokkkk", "??");
+
+            if (exception != null) {
+                Log.d("kakao_session_error", exception.toString());
             }
-
-            @Override
-            public void onFailure(Call<Login> call, Throwable t) {
-                Log.d("sdfsdf", t.toString());
-            }
-        });
-
-
+//            FacebookSdk.sdkInitialize(SignUpActivity.this);
+//            callbackManager = CallbackManager.Factory.create();
+            setContentView(R.layout.activity_login);
+        }
     }
 }

@@ -1,7 +1,11 @@
 package dct.com.everyfoody.ui.home.user;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -11,6 +15,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +28,8 @@ import android.widget.Toast;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +53,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.kakao.util.helper.Utility.getPackageInfo;
 import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
@@ -105,6 +113,7 @@ public class MainActivity extends WhiteThemeActivity {
 
         Log.d("????",SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
 
+        Log.d("hashdddddd", getKeyHash(MainActivity.this));
         mapClipTextViews = new TextView[MAP_CLIP_COUNT];
         mapClipImageViews = new ImageView[MAP_CLIP_COUNT];
         View mapClipContainer = findViewById(R.id.map_clip_container);
@@ -118,6 +127,25 @@ public class MainActivity extends WhiteThemeActivity {
         }
 
     }
+
+    public static String getKeyHash(final Context context) {
+        PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_SIGNATURES);
+        if (packageInfo == null)
+            return null;
+
+        for (Signature signature : packageInfo.signatures) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                return Base64.encodeToString(md.digest(), Base64.NO_WRAP);
+            } catch (NoSuchAlgorithmException e) {
+                Log.e("d", "Unable to get MessageDigest. signature=" + signature, e);
+            }
+        }
+        return null;
+    }
+
+
 
     private void setInitSetting() {
         SharedPreferencesService.getInstance().load(this);
@@ -196,7 +224,7 @@ public class MainActivity extends WhiteThemeActivity {
         mainRecycler.setAdapter(adapter);
 
         loggedDrawer.settingRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        settingAdapter = new SettingRecyclerAdapter(bookMarkList);
+        settingAdapter = new SettingRecyclerAdapter(bookMarkList, getApplicationContext());
         loggedDrawer.settingRecycler.setAdapter(settingAdapter);
 
 

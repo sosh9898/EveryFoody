@@ -65,7 +65,7 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
     private void setRecycler() {
         statusList = new ArrayList<>();
         loggedDrawer.settingRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        settingAdapter = new OwnerSettingRecyclerAdapter(statusList);
+        settingAdapter = new OwnerSettingRecyclerAdapter(statusList, getApplicationContext());
         loggedDrawer.settingRecycler.setAdapter(settingAdapter);
     }
 
