@@ -13,17 +13,54 @@ import dct.com.everyfoody.base.BaseModel;
 
 public class MainList extends BaseModel{
 
-
     @SerializedName("data")
     @Expose
-    private List<TruckList> truckLists = null;
+    private Data data;
 
-    public List<TruckList> getTruckLists() {
-        return truckLists;
+    public Data getData() {
+        return data;
     }
 
-    public void setTruckLists(List<TruckList> truckLists) {
-        this.truckLists = truckLists;
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public class Data {
+        @SerializedName("store")
+        @Expose
+        private List<TruckList> truckLists = null;
+        @SerializedName("notice")
+        @Expose
+        private int noticeCode;
+        @SerializedName("token")
+        @Expose
+        private String userToken;
+
+        public String getUserToken() {
+            return userToken;
+        }
+
+        public void setUserToken(String userToken) {
+            this.userToken = userToken;
+        }
+
+        public int getNoticeCode() {
+            return noticeCode;
+        }
+
+        public void setNoticeCode(int noticeCode) {
+            this.noticeCode = noticeCode;
+        }
+
+        public List<TruckList> getTruckLists() {
+            return truckLists;
+        }
+
+        public void setTruckLists(List<TruckList> truckLists) {
+            this.truckLists = truckLists;
+        }
+
+
     }
 
     public class TruckList {

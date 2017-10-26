@@ -24,7 +24,7 @@
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/push_item_switch"
             style="@style/pushSwitch"
-            android:layout_width="40dp"
+            android:layout_width="60dp"
             android:layout_height="26dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"

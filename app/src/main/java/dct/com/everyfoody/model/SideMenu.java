@@ -26,6 +26,9 @@ public class SideMenu extends BaseModel {
     }
 
     public class SideInfo{
+        @SerializedName("imageURL")
+        @Expose
+        private String imageUrl;
         @SerializedName("reservationCount")
         @Expose
         private int resNum;
@@ -38,6 +41,14 @@ public class SideMenu extends BaseModel {
         @SerializedName("toggleStatus")
         @Expose
         private List<Integer> ownerStatus;
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
 
         public List<Integer> getOwnerStatus() {
             return ownerStatus;

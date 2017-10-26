@@ -1,8 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="280dp">
+
+        <ImageView
+            android:id="@+id/edit_main_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorEditMainImage"></FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="105dp"
+            android:gravity="center_horizontal"
+            android:text="가게 대표사진"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/edit_main_image_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="131dp"
+            android:src="@drawable/photo_icon" />
+
+    </RelativeLayout>
 
 
     <RelativeLayout
@@ -124,6 +166,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_marginBottom="30dp"
         android:layout_width="293dp"
         android:layout_height="39dp"
         android:layout_gravity="center_horizontal"
@@ -141,4 +184,6 @@
             android:textSize="14sp" />
 
     </RelativeLayout>
-</LinearLayout>
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

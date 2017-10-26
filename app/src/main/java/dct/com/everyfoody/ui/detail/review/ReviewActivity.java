@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -37,6 +38,7 @@ import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.request.NetworkService;
+import dct.com.everyfoody.ui.login.LoginActivity;
 import gun0912.tedbottompicker.TedBottomPicker;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -47,6 +49,7 @@ import retrofit2.Response;
 
 import static android.R.attr.maxHeight;
 import static android.R.attr.maxWidth;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
 
 public class ReviewActivity extends WhiteThemeActivity {
     @BindView(R.id.review_toolbar)
@@ -63,6 +66,8 @@ public class ReviewActivity extends WhiteThemeActivity {
     private List<ResReview.Review> reviewList;
     private int tempId;
     private Uri resultUri;
+    private String rating;
+    private ReviewDialog reviewDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +86,11 @@ public class ReviewActivity extends WhiteThemeActivity {
     }
 
     private void getReviewList() {
-        Call<ResReview> getReviewList = networkService.getReviewList(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), tempId);
+        String token = SharedPreferencesService.getInstance().getPrefStringData("auth_token");
+        if (token.equals(""))
+            token = "nonLoginUser";
+
+        Call<ResReview> getReviewList = networkService.getReviewList(token, tempId);
 
         getReviewList.enqueue(new Callback<ResReview>() {
             @Override
@@ -142,7 +151,7 @@ public class ReviewActivity extends WhiteThemeActivity {
     private void registerReview() {
         RequestBody storeId = RequestBody.create(MediaType.parse("multipart/form-data"), tempId + "");
         RequestBody content = RequestBody.create(MediaType.parse("multipart/form-data"), commentEdit.getText().toString());
-        RequestBody score = RequestBody.create(MediaType.parse("multipart/form-data"), "4");
+        RequestBody score = RequestBody.create(MediaType.parse("multipart/form-data"), rating);
 
         MultipartBody.Part body;
 
@@ -179,6 +188,10 @@ public class ReviewActivity extends WhiteThemeActivity {
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equals("success")) {
                         ToastMaker.makeShortToast(getApplicationContext(), "성공");
+                        getReviewList();
+                        reviewDialog.dismiss();
+                        commentEdit.setText("");
+                        previewImage.setVisibility(View.GONE);
                     }
                 }
             }
@@ -191,8 +204,23 @@ public class ReviewActivity extends WhiteThemeActivity {
 
     @OnClick(R.id.comment_register_btn)
     public void onClickRegisterReview(View view) {
-        registerReview();
+        if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST) {
+            Intent needLogin = new Intent(this, LoginActivity.class);
+            startActivity(needLogin);
+        } else {
+            reviewDialog = new ReviewDialog(this, yesClickListener);
+            reviewDialog.show();
+        }
+
     }
+
+    public View.OnClickListener yesClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            rating = String.valueOf(((RatingBar)reviewDialog.findViewById(R.id.regiter_review_rating)).getRating()*2);
+            registerReview();
+        }
+    };
 
     @OnClick(R.id.comment_select_image)
     public void onClickSelectImage(View view) {

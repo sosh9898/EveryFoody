@@ -1,5 +1,6 @@
 package dct.com.everyfoody.ui.detail.edit;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,8 +16,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.model.StoreInfo;
+
+import static dct.com.everyfoody.ui.detail.edit.EditActivity.MENU_ADD;
 
 /**
  * Created by jyoung on 2017. 10. 4..
@@ -61,6 +65,13 @@ public class MenuEditFragment extends Fragment {
         menuEditRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         editMenuRecyclerAdapter = new EditMenuRecyclerAdapter(menuInfoList, getContext());
         menuEditRecycler.setAdapter(editMenuRecyclerAdapter);
+    }
+
+    @OnClick(R.id.menu_item_add_btn)
+    public void onClickMenuAdd(View view){
+        Intent addIntent =new Intent(getContext(), EditMenuActivity.class);
+        addIntent.putExtra("addORedit", MENU_ADD);
+        startActivity(addIntent);
     }
 
 }
