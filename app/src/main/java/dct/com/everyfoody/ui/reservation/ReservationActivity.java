@@ -1,5 +1,6 @@
 package dct.com.everyfoody.ui.reservation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.Reservation;
 import dct.com.everyfoody.request.NetworkService;
+import dct.com.everyfoody.ui.detail.DetailActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,6 +35,8 @@ public class ReservationActivity extends WhiteThemeActivity {
     private ReserveRecyclerAdapter reserveRecyclerAdapter;
     private List<Reservation.Store> reservationList;
     private NetworkService networkService;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,7 @@ public class ReservationActivity extends WhiteThemeActivity {
     private void setToolbar(){
         reservationToolbar.setTitle("");
         setSupportActionBar(reservationToolbar);
-        reservationToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_white));
+        reservationToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back));
         reservationToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,6 +91,7 @@ public class ReservationActivity extends WhiteThemeActivity {
         });
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.complete_delete, menu);
@@ -95,22 +102,38 @@ public class ReservationActivity extends WhiteThemeActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        switch (id){
+            case R.id.menu_delete:
+                Gson gson = new Gson();
+                String list = gson.toJson(reservationList);
+                Intent cancelIntent = new Intent(getApplicationContext(), ReserveCancelActivity.class);
+                cancelIntent.putExtra("reservationList", list);
+                startActivity(cancelIntent);
+                break;
+            default:
+                break;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem deleteIc = menu.findItem(R.id.menu_delete);
         MenuItem completeIc = menu.findItem(R.id.menu_complete);
+
+        completeIc.setVisible(false);
 
 
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
+    public View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
+            final int tempPosition = reserveRecycler.getChildPosition(view);
+            Intent detailIntent = new Intent(view.getContext(), DetailActivity.class);
+            detailIntent.putExtra("storeId", reservationList.get(tempPosition).getStoreID());
+            startActivity(detailIntent);
         }
     };
 

@@ -92,11 +92,6 @@ public interface NetworkService {
     @GET("/management/customers/lists")
     Call<Turn> getTurnList(@Header("token") String token);
 
-    //가게 기본정보 수정
-    @POST("/management/myinfo/basic/modification")
-    Call<BaseModel> modifyBasicInfo(@Header("token") String token,
-                                    @Body StoreInfo.BasicInfo basicInfo);
-
     //메뉴 추가
     @Multipart
     @PUT("/management/myinfo/menu/addition")
@@ -128,7 +123,7 @@ public interface NetworkService {
 
     //토글 체크해제(이용자)
     @PUT("/main/toggle/user/closing/{owner_id}")
-    Call<BaseModel> unCheckedToggle(@Header("token") String token, @Path("owner_id") int owner_id);
+    Call<BaseModel> unCheckedToggle(@Header("token") String token, @Path("owner_id") int ownerId);
 
     //토글 체크(사업자)
     @PUT("/main/toggle/owner/opening/{kind}")
@@ -141,5 +136,26 @@ public interface NetworkService {
     //아이디 체크
     @GET("/signin/checking/{user_uid}")
     Call<CheckId> checkId(@Path("user_uid") String uid);
+
+    //프로필 수정
+    @Multipart
+    @PUT("management/myprofile")
+    Call<BaseModel> modifyProfile(@Header("token") String token,
+                                  @Part MultipartBody.Part file);
+
+    //순번 제거
+    @DELETE("management/customers/lists/remove")
+    Call<BaseModel> nextGuset(@Header("token") String token);
+
+    //가게 대표 이미지 수정
+    @Multipart
+    @PUT("management/myinfo/basic/imagemodi")
+    Call<BaseModel> modifyStoreImage(@Header("token") String token,
+                                     @Part MultipartBody.Part[] files);
+
+    //가게 기본정보 수정
+    @POST("/management/myinfo/basic/modification")
+    Call<BaseModel> modifyBasicInfo(@Header("token") String token,
+                                    @Body StoreInfo.BasicInfo basicInfo);
 
 }

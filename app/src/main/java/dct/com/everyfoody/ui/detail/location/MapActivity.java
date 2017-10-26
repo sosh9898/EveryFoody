@@ -3,11 +3,13 @@ package dct.com.everyfoody.ui.detail.location;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +24,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +53,8 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
     @BindView(R.id.map_toolbar)Toolbar mapToolbar;
     @BindView(R.id.map_booking_count)TextView bookingCount;
     @BindView(R.id.map_booking)TextView mapBottomSheetText;
+    @BindView(R.id.search_view)MaterialSearchView searchView;
+    @BindView(R.id.map_text)TextView mapText;
 
     private NetworkService networkService;
     private double mLatitude, mLongitude;
@@ -74,6 +81,36 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
                 break;
         }
         setToolbar();
+
+        searchView.setVoiceSearch(false);
+        searchView.setEllipsize(true);
+        searchView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                ToastMaker.makeShortToast(getApplicationContext(), query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+
+            }
+        });
     }
 
     private void startMapGuest(){
@@ -100,6 +137,8 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
                     if(response.body().getStatus().equals("success")){
                         mLatitude = response.body().getLocation().getStoreLatitude();
                         mLongitude = response.body().getLocation().getStoreLongitude();
+
+                        bookingCount.setText("대기인원 "+response.body().getLocation().getReservationCount()+"명");
 
                         setMap();
                     }
@@ -152,18 +191,11 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_search);
+        searchView.setMenuItem(item);
+
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.menu_search){
-            replaceFragment(RecentSearchFragment.getInstance(),null);
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void replaceFragment(Fragment fragment, @Nullable Bundle bundle){
@@ -180,8 +212,6 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
 
         }
         else{
-            Log.d("mappp", "??");
-
             final OpenLocation openLocation = new OpenLocation();
             openLocation.setLatitude(mLatitude);
             openLocation.setLongtitude(mLongitude);
@@ -204,6 +234,31 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
                     Log.d("mappp", t.toString());
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && matches.size() > 0) {
+                String searchWrd = matches.get(0);
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    searchView.setQuery(searchWrd, false);
+                }
+            }
+
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
         }
     }
 }

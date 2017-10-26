@@ -10,14 +10,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.yalantis.ucrop.UCrop;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.base.WhiteThemeActivity;
@@ -30,11 +28,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static dct.com.everyfoody.ui.detail.edit.NormalEditFragment.THUMBNAIL_CROP;
+
 public class EditActivity extends WhiteThemeActivity {
     @BindView(R.id.edit_toolbar)Toolbar editToolbar;
     @BindView(R.id.edit_viewpager)ViewPager editViewPager;
     @BindView(R.id.edit_tablayout)TabLayout editTab;
-    @BindView(R.id.edit_main_image)ImageView mainImage;
 
     private EditPagerAdapter editPagerAdapter;
     private StoreInfo storeInfo;
@@ -75,21 +74,15 @@ public class EditActivity extends WhiteThemeActivity {
         });
     }
 
-    private void setLayout(){
+    private void setLayout() {
         editPagerAdapter = new EditPagerAdapter(getSupportFragmentManager(), storeInfo);
         editViewPager.setAdapter(editPagerAdapter);
-        editTab.addTab(editTab.newTab().setText("기본정보"));
-        editTab.addTab(editTab.newTab().setText("메뉴정보"));
         editTab.setupWithViewPager(editViewPager);
-        Glide.with(this).load(storeInfo.getDetailInfo().getBasicInfo().getStoreImage()).into(mainImage);
+        editTab.getTabAt(0).setText("기본정보");
+        editTab.getTabAt(1).setText("메뉴정보");
     }
 
-    @OnClick(R.id.menu_item_add_btn)
-    public void onClickMenuAdd(View view){
-        Intent addIntent =new Intent(getApplicationContext(), EditMenuActivity.class);
-        addIntent.putExtra("addORedit", MENU_ADD);
-        startActivity(addIntent);
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,8 +99,6 @@ public class EditActivity extends WhiteThemeActivity {
             storeInfo.getDetailInfo().setBasicInfo(((NormalEditFragment)fragment).getEditInfo());
             Log.d("??",storeInfo.getDetailInfo().getBasicInfo().getStoreImage()
             + storeInfo.getDetailInfo().getBasicInfo().getStoreBreaktime());
-
-
 
             Call<BaseModel> basicEditCall = networkService.modifyBasicInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),
                     storeInfo.getDetailInfo().getBasicInfo());
@@ -131,5 +122,26 @@ public class EditActivity extends WhiteThemeActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == UCrop.REQUEST_CROP) {
+                {
+                    Fragment fragment = editPagerAdapter.getRegisteredFragment(0);
+                    if (fragment != null) {
+                        ((NormalEditFragment) fragment).onActivityResult(requestCode, resultCode, data);
+                    }
+                }
+            }
+            else if(requestCode == THUMBNAIL_CROP){
+                Fragment fragment = editPagerAdapter.getRegisteredFragment(0);
+                if (fragment != null) {
+                    ((NormalEditFragment) fragment).onActivityResult(requestCode, resultCode, data);
+                }
+            }
+        }
     }
 }

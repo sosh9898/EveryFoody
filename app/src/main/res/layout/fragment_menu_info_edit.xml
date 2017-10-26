@@ -7,8 +7,21 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/edit_menu_rcv"
+        android:layout_above="@+id/menu_item_add_btn"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/layout_menu_edit_rcv_item"></android.support.v7.widget.RecyclerView>
 
+
+    <Button
+        android:layout_alignParentBottom="true"
+        android:id="@+id/menu_item_add_btn"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/colorAccent"
+        android:text="메뉴 추가하기"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        />
 </RelativeLayout>

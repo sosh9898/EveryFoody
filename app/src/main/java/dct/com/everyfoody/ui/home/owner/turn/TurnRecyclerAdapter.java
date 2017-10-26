@@ -1,5 +1,6 @@
 package dct.com.everyfoody.ui.home.owner.turn;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +21,16 @@ import dct.com.everyfoody.model.Turn;
 
 public class TurnRecyclerAdapter extends RecyclerView.Adapter {
     private List<Turn.TurnInfo> turnInfoList;
+    private Context context;
 
     public void refreshAdapter(List<Turn.TurnInfo> turnInfoList){
         this.turnInfoList = turnInfoList;
         notifyDataSetChanged();
     }
 
-    public TurnRecyclerAdapter(List<Turn.TurnInfo> turnInfoList) {
+    public TurnRecyclerAdapter(List<Turn.TurnInfo> turnInfoList, Context context) {
         this.turnInfoList = turnInfoList;
+        this.context = context;
     }
 
     @Override
@@ -64,7 +67,11 @@ public class TurnRecyclerAdapter extends RecyclerView.Adapter {
             turnTime.setText(turnInfoItem.getReservationTime());
             turnUser.setText(turnInfoItem.getUserNickname() + turnInfoItem.getUserPhone());
             if(getAdapterPosition()%2 ==1){
-                turnBorder.setBackgroundResource(R.color.colorPrimaryDark);
+                turnBorder.setBackgroundResource(R.drawable.owner_home_background2);
+                turnUser.setTextColor(context.getResources().getColor(R.color.colorAccent));
+                turnIndex.setTextColor(context.getResources().getColor(R.color.colorAccent));
+                turnTime.setTextColor(context.getResources().getColor(R.color.colorAccent));
+
             }
 
         }

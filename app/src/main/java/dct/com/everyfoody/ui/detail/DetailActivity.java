@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -46,6 +48,12 @@ public class DetailActivity extends OrangeThemeActivity {
     Toolbar detailToolbar;
     @BindView(R.id.detail_main_image)
     ImageView mainImage;
+    @BindView(R.id.booking_count)
+    TextView bookingCount;
+    @BindView(R.id.booking)
+    TextView booking;
+    @BindView(R.id.review_btn)
+    LinearLayout reviewBtn;
 
     public static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -54,6 +62,7 @@ public class DetailActivity extends OrangeThemeActivity {
     private StoreInfo storeInfo;
     private int bookmarkFlag;
     private int userStatus;
+    private ReserveDialog reserveDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +92,7 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
     private void getMyStoreInfo() {
-        Call<StoreInfo> getMyStoreInfo = networkService.getMyStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
+        final Call<StoreInfo> getMyStoreInfo = networkService.getMyStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
 
         getMyStoreInfo.enqueue(new Callback<StoreInfo>() {
             @Override
@@ -92,6 +101,8 @@ public class DetailActivity extends OrangeThemeActivity {
                     if(response.body().getStatus().equals("success")){
                         storeInfo = response.body();
                         networkAfter();
+                        reviewBtn.setVisibility(View.GONE);
+                        booking.setText("후기");
                     }
                 }
             }
@@ -111,7 +122,11 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
     private void getStoreInfo() {
-        Call<StoreInfo> getStoreInfo = networkService.getStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
+        String token = SharedPreferencesService.getInstance().getPrefStringData("auth_token");
+        if(token.equals(""))
+            token = "nonLoginUser";
+
+        Call<StoreInfo> getStoreInfo = networkService.getStoreInfo(token, storeId);
 
         getStoreInfo.enqueue(new Callback<StoreInfo>() {
             @Override
@@ -121,6 +136,10 @@ public class DetailActivity extends OrangeThemeActivity {
                         storeInfo = response.body();
                         networkAfter();
                         bookmarkFlag = storeInfo.getDetailInfo().getBasicInfo().getBookmarkCheck();
+                        bookingCount.setText("대기인원 "+storeInfo.getDetailInfo().getBasicInfo().getReservationCount()+"명");
+                        if(storeInfo.getDetailInfo().getBasicInfo().getReservationCheck()==1){
+                            booking.setText("순번 대기중");
+                        }
                     }
                 }
             }
@@ -205,9 +224,6 @@ public class DetailActivity extends OrangeThemeActivity {
         MenuItem bookmarkOff = menu.findItem(R.id.menu_detail_bookmark_off);
         MenuItem edit = menu.findItem(R.id.menu_detail_edit);
 
-        Log.d("??", SharedPreferencesService.getInstance().getPrefIntegerData("user_status") +"");
-
-
         if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") == RESULT_GUEST) {
             edit.setVisible(false);
             if (bookmarkFlag == 0) {
@@ -239,27 +255,42 @@ public class DetailActivity extends OrangeThemeActivity {
 
     @OnClick(R.id.booking)
     public void bookingClick(View view) {
+        if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST) {
+            Intent needLogin = new Intent(this, LoginActivity.class);
+            startActivity(needLogin);
+        }else
         reserve();
     }
 
     private void reserve() {
-        Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
-
-        reserveCall.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success"))
-                        ToastMaker.makeShortToast(getApplicationContext(), "성공");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseModel> call, Throwable t) {
-
-            }
-        });
+        reserveDialog = new ReserveDialog(this, reserveYes);
+        reserveDialog.show();
     }
+
+    public View.OnClickListener reserveYes = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
+
+            reserveCall.enqueue(new Callback<BaseModel>() {
+                @Override
+                public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+                    if (response.isSuccessful()) {
+                        if (response.body().getStatus().equals("success")) {
+                            ToastMaker.makeShortToast(getApplicationContext(), "성공");
+                            booking.setText("순번 대기중");
+                            reserveDialog.dismiss();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<BaseModel> call, Throwable t) {
+
+                }
+            });
+        }
+    };
 
     private void bookmark() {
 
@@ -288,4 +319,11 @@ public class DetailActivity extends OrangeThemeActivity {
             }
         });
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        getStoreInfo();
+//    }
 }

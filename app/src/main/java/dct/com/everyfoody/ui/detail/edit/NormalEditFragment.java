@@ -1,19 +1,55 @@
 package dct.com.everyfoody.ui.detail.edit;
 
+import android.Manifest;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+import com.yalantis.ucrop.UCrop;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.BaseModel;
+import dct.com.everyfoody.base.util.SharedPreferencesService;
+import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.StoreInfo;
+import dct.com.everyfoody.request.NetworkService;
+import gun0912.tedbottompicker.TedBottomPicker;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.R.attr.maxHeight;
+import static android.R.attr.maxWidth;
+import static android.app.Activity.RESULT_OK;
+import static com.facebook.FacebookSdk.getCacheDir;
 
 /**
  * Created by jyoung on 2017. 10. 4..
@@ -27,8 +63,15 @@ public class NormalEditFragment extends Fragment {
     @BindView(R.id.edit_facebook_url)EditText facebookEdit;
     @BindView(R.id.edit_twitter_url)EditText twitterEdit;
     @BindView(R.id.edit_instagram_url)EditText instagramEdit;
+    @BindView(R.id.edit_main_image)ImageView mainImage;
 
     private StoreInfo.BasicInfo basicInfo;
+    private NetworkService networkService;
+    private Uri[] resultUri = new Uri[2];
+    private Uri tempUri;
+    private File[] files;
+
+    public static final int THUMBNAIL_CROP = 1000;
 
     public NormalEditFragment() {
     }
@@ -44,6 +87,8 @@ public class NormalEditFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_normal_info_edit, null);
         ButterKnife.bind(this, view);
+        networkService = ApplicationController.getInstance().getNetworkService();
+        SharedPreferencesService.getInstance().load(getContext());
         if(getArguments() != null){
             Gson gson = new Gson();
             basicInfo = gson.fromJson(getArguments().getString("basic"), StoreInfo.BasicInfo.class);
@@ -67,6 +112,7 @@ public class NormalEditFragment extends Fragment {
         facebookEdit.setText(basicInfo.getStoreFacebookURL());
         twitterEdit.setText(basicInfo.getStoreTwitterURL());
         instagramEdit.setText(basicInfo.getStoreInstagramURL());
+        Glide.with(getContext()).load(basicInfo.getStoreImage()).into(mainImage);
     }
 
     public StoreInfo.BasicInfo getEditInfo(){
@@ -79,5 +125,158 @@ public class NormalEditFragment extends Fragment {
         basicInfo.setStoreTwitterURL(twitterEdit.getText().toString());
 
         return basicInfo;
+    }
+
+    @OnClick(R.id.edit_main_image_picker)
+    public void selectImage(View view){
+        checkPermission();
+        getImage();
+
+    }
+
+    private void modifyImage(){
+        MultipartBody.Part[] body = new MultipartBody.Part[2];
+        files = new File[body.length];
+
+
+        for (int i = 0; i < body.length; i++) {
+            if (resultUri[i].toString() == "") {
+                body[i] = null;
+            } else {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+
+                InputStream in = null;
+                try {
+                    in = getActivity().getContentResolver().openInputStream(resultUri[i]);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                RequestBody photoBody = RequestBody.create(MediaType.parse("image/jpg"), baos.toByteArray());
+
+                files[i] = new File(resultUri[i].toString());
+
+                body[i] = MultipartBody.Part.createFormData("image", files[i].getName(), photoBody);
+                bitmap.recycle();
+            }
+        }
+
+        Call<BaseModel> editMainImageCall = networkService.modifyStoreImage(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), body);
+
+        editMainImageCall.enqueue(new Callback<BaseModel>() {
+            @Override
+            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().equals("success")){
+                        Glide.with(mainImage.getContext())
+                                .load(resultUri[0])
+                                .into(mainImage);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseModel> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void getImage(){
+        TedBottomPicker tedBottomPicker = new TedBottomPicker.Builder(getActivity())
+                .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
+                    @Override
+                    public void onImageSelected(Uri uri) {
+                        tempUri = uri;
+                        Log.d("tempUri", tempUri.toString());
+
+                        cropImage(uri);
+                    }
+                })
+                .create();
+
+        tedBottomPicker.show(getActivity().getSupportFragmentManager());
+    }
+
+    private void cropImage(Uri uri) {
+        UCrop.Options options = new UCrop.Options();
+        options.setToolbarColor(getResources().getColor(R.color.colorAccent));
+        options.setToolbarTitle("사진 편집");
+        options.setStatusBarColor(getResources().getColor(R.color.colorAccent));
+
+        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), uri.toString().substring(uri.toString().lastIndexOf('/') + 1)));
+
+
+        UCrop.of(uri, mDestinationUri)
+                .withOptions(options)
+                .withAspectRatio(3.6f, 2.8f)
+                .withMaxResultSize(maxWidth, maxHeight)
+                .start(getActivity());
+    }
+
+    private void checkPermission() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Toast.makeText(getContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(getContext(), "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        TedPermission.with(getContext())
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+                .check();
+    }
+
+    private void thumbnailCrop(){
+        UCrop.Options options = new UCrop.Options();
+        options.setToolbarColor(getResources().getColor(R.color.colorAccent));
+        options.setToolbarTitle("사진 편집");
+        options.setStatusBarColor(getResources().getColor(R.color.colorAccent));
+
+        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), "thumbnail"+tempUri.toString().substring(tempUri.toString().lastIndexOf('/') + 1)));
+
+
+        UCrop.of(tempUri, mDestinationUri)
+                .withOptions(options)
+                .withAspectRatio(3.1f, 1.3f)
+                .withMaxResultSize(maxWidth, maxHeight)
+                .start(getActivity(), THUMBNAIL_CROP);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK ) {
+            if(requestCode == UCrop.REQUEST_CROP) {
+                final Uri cropUri = UCrop.getOutput(data);
+                resultUri[1] = cropUri;
+                thumbnailCrop();
+            }
+            else if(requestCode == THUMBNAIL_CROP){
+                final Uri cropUri = UCrop.getOutput(data);
+                resultUri[0] = cropUri;
+                modifyImage();
+            }
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
+        }
     }
 }

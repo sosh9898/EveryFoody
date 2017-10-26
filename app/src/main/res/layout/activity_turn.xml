@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorPrimary"
     tools:context="dct.com.everyfoody.ui.notification.NotifyActivity">
 
-
+<android.support.design.widget.AppBarLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <android.support.v7.widget.Toolbar
         android:id="@+id/turn_toolbar"
         android:layout_width="match_parent"
@@ -26,14 +28,16 @@
 
     </android.support.v7.widget.Toolbar>
 
+</android.support.design.widget.AppBarLayout>
+
     <android.support.v7.widget.RecyclerView
-        android:layout_marginTop="25dp"
         android:layout_gravity="center_horizontal"
         android:id="@+id/turn_rcv"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/layout_turn_rcv_item">
 
     </android.support.v7.widget.RecyclerView>
 
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
