@@ -3,7 +3,6 @@ package dct.com.everyfoody.ui.home.owner;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
-import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.request.NetworkService;
 import retrofit2.Call;
@@ -26,6 +25,8 @@ import retrofit2.Response;
 
 import static dct.com.everyfoody.ui.home.user.MainActivity.TOGGLE_CHECKED;
 import static dct.com.everyfoody.ui.home.user.MainActivity.TOGGLE_UNCHECKED;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 
 /**
  * Created by jyoung on 2017. 10. 4..
@@ -83,8 +84,6 @@ public class OwnerSettingRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         public void bindView(int status) {
-
-            Log.d("??", status+"");
             switch (getAdapterPosition()) {
                 case 0:
                     storeName.setText("순번 추가시");
@@ -128,41 +127,39 @@ public class OwnerSettingRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         private void switchChecked() {
-            Call<BaseModel> checkedCall = networkService.checkedToggleOwner(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), kind);
+            Call<BaseModel> checkedCall = networkService.checkedToggleOwner(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), kind);
 
             checkedCall.enqueue(new Callback<BaseModel>() {
                 @Override
                 public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                     if (response.isSuccessful()) {
-                        if (response.body().getStatus().equals("success")) {
-                            ToastMaker.makeShortToast(mContext, "체크 성공");
+                        if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                    LogUtil.d(mContext, t.toString());
                 }
             });
         }
 
         private void switchUnChecked() {
-            Call<BaseModel> unCheckedCall = networkService.unCheckedToggleOwner(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), kind);
+            Call<BaseModel> unCheckedCall = networkService.unCheckedToggleOwner(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), kind);
 
             unCheckedCall.enqueue(new Callback<BaseModel>() {
                 @Override
                 public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                     if (response.isSuccessful()) {
-                        if (response.body().getStatus().equals("success")) {
-                            ToastMaker.makeShortToast(mContext, "해제 성공");
+                        if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                    LogUtil.d(mContext, t.toString());
                 }
             });
         }

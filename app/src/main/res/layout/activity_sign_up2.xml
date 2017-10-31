@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="dct.com.everyfoody.ui.signup.user.SignUp2Activity">
+    tools:context="dct.com.everyfoody.ui.signup.SignUp2Activity">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -27,6 +27,7 @@
         android:src="@drawable/logo_1" />
 
     <TextView
+        android:id="@+id/signup_status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="13dp"
@@ -36,6 +37,7 @@
         android:textStyle="bold" />
 
     <EditText
+        android:singleLine="true"
         android:id="@+id/signup_name_edit"
         android:layout_marginTop="44dp"
         android:background="@drawable/sigu_up_edit"
@@ -47,6 +49,9 @@
         android:hint="             본인의 실명을 입력해주세요."/>
 
     <EditText
+        android:inputType="phone"
+        android:maxLength="13"
+        android:singleLine="true"
         android:id="@+id/signup_phone_edit"
         android:layout_marginTop="11dp"
         android:background="@drawable/sigu_up_edit"

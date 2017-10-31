@@ -14,7 +14,7 @@
         android:background="@null"
         app:civ_border_color="#26000000"
         app:civ_border_width="2dp"
-        android:src="@color/colorPrimary" />
+        android:src="@drawable/profile" />
 
     <RelativeLayout
         android:layout_marginTop="56dp"
@@ -69,7 +69,7 @@
                 android:textColor="@color/colorAccent"
                 android:textSize="45sp"
                 android:layout_marginTop="34dp"
-                android:text="3"
+                android:text="0"
                 android:layout_toLeftOf="@+id/bookmark_count"
                 android:layout_toStartOf="@+id/bookmark_count" />
 
@@ -95,7 +95,7 @@
                 android:layout_marginTop="34dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="45sp"
-                android:text="4" />
+                android:text="0" />
 
         </RelativeLayout>
 
@@ -128,6 +128,7 @@
             android:background="@color/colorPrimaryDark" />
 
         <Button
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:id="@+id/logout_btn"
             android:layout_width="match_parent"
             android:layout_height="55dp"

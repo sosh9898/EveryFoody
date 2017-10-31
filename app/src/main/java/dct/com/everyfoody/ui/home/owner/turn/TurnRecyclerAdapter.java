@@ -8,12 +8,17 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.model.Turn;
+
+import static dct.com.everyfoody.ui.notification.NotiRecyclerAdapter.calculateTime;
 
 /**
  * Created by jyoung on 2017. 10. 4..
@@ -23,7 +28,7 @@ public class TurnRecyclerAdapter extends RecyclerView.Adapter {
     private List<Turn.TurnInfo> turnInfoList;
     private Context context;
 
-    public void refreshAdapter(List<Turn.TurnInfo> turnInfoList){
+    public void refreshAdapter(List<Turn.TurnInfo> turnInfoList) {
         this.turnInfoList = turnInfoList;
         notifyDataSetChanged();
     }
@@ -41,7 +46,11 @@ public class TurnRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((TurnItemViewHolder)holder).bindView(turnInfoList.get(position));
+        try {
+            ((TurnItemViewHolder) holder).bindView(turnInfoList.get(position));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -50,11 +59,15 @@ public class TurnRecyclerAdapter extends RecyclerView.Adapter {
     }
 
 
-    public class TurnItemViewHolder extends RecyclerView.ViewHolder{
-        @BindView(R.id.turn_index)TextView turnIndex;
-        @BindView(R.id.turn_user)TextView turnUser;
-        @BindView(R.id.turn_time)TextView turnTime;
-        @BindView(R.id.turn_border)RelativeLayout turnBorder;
+    public class TurnItemViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.turn_index)
+        TextView turnIndex;
+        @BindView(R.id.turn_user)
+        TextView turnUser;
+        @BindView(R.id.turn_time)
+        TextView turnTime;
+        @BindView(R.id.turn_border)
+        RelativeLayout turnBorder;
 
 
         public TurnItemViewHolder(View itemView) {
@@ -62,20 +75,26 @@ public class TurnRecyclerAdapter extends RecyclerView.Adapter {
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindView(Turn.TurnInfo turnInfoItem){
-            turnIndex.setText((getAdapterPosition()+1)+"");
-            turnTime.setText(turnInfoItem.getReservationTime());
-            turnUser.setText(turnInfoItem.getUserNickname() + turnInfoItem.getUserPhone());
-            if(getAdapterPosition()%2 ==1){
+        public void bindView(Turn.TurnInfo turnInfoItem) throws ParseException {
+            turnIndex.setText((getAdapterPosition() + 1) + "");
+            String resultTime = turnInfoItem.getReservationTime();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = format.parse(resultTime);
+
+            turnTime.setText(calculateTime(date).toString());
+            turnUser.setText(turnInfoItem.getUserNickname() + getPhoneNum(turnInfoItem.getUserPhone()));
+            if (getAdapterPosition() % 2 == 1) {
                 turnBorder.setBackgroundResource(R.drawable.owner_home_background2);
                 turnUser.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 turnIndex.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 turnTime.setTextColor(context.getResources().getColor(R.color.colorAccent));
 
             }
-
         }
 
-
+        private String getPhoneNum(String phone) {
+            String tempPhone[] = phone.split("-");
+            return "(" + tempPhone[2] + ")";
+        }
     }
 }

@@ -6,14 +6,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.gun0912.tedpermission.PermissionListener;
@@ -33,11 +36,13 @@ import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.request.NetworkService;
+import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.login.LoginActivity;
 import gun0912.tedbottompicker.TedBottomPicker;
 import okhttp3.MediaType;
@@ -49,9 +54,13 @@ import retrofit2.Response;
 
 import static android.R.attr.maxHeight;
 import static android.R.attr.maxWidth;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.USER_STATUS;
 
-public class ReviewActivity extends WhiteThemeActivity {
+public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.review_toolbar)
     Toolbar reviewToolbar;
     @BindView(R.id.review_rcv)
@@ -60,6 +69,11 @@ public class ReviewActivity extends WhiteThemeActivity {
     EditText commentEdit;
     @BindView(R.id.selected_image_preview)
     ImageView previewImage;
+    @BindView(R.id.comment_item)
+    LinearLayout commentItem;
+    @BindView(R.id.warning_layout)
+    View warningLayout;
+    @BindView(R.id.review_srl)SwipeRefreshLayout reviewRefreshLayout;
 
     private ReviewRecyclerAdapter reviewRecyclerAdapter;
     private NetworkService networkService;
@@ -68,6 +82,7 @@ public class ReviewActivity extends WhiteThemeActivity {
     private Uri resultUri;
     private String rating;
     private ReviewDialog reviewDialog;
+    private BookmarkActivity.NonDataWarning nonDataWarning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +95,57 @@ public class ReviewActivity extends WhiteThemeActivity {
         Intent getId = getIntent();
         tempId = getId.getExtras().getInt("storeId");
 
+        checkUserStatus();
         setToolbar();
         setRecycler();
         getReviewList();
+        setRefresh();
+        checkTextLength();
+    }
+    private void checkTextLength(){
+        commentEdit.addTextChangedListener(new TextWatcher() {
+            String strCur;
+            @Override
+            public void beforeTextChanged(CharSequence c, int i, int i1, int i2) {
+                if(c.length() > 30){
+                    commentEdit.setText(strCur);
+                    ToastMaker.makeShortToast(getApplicationContext(), "리뷰는 30자 제한입니다.");
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence c, int i, int i1, int i2) {
+                strCur = c.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+
+    private void setRefresh(){
+        reviewRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        reviewRefreshLayout.setOnRefreshListener(this);
+    }
+
+    private void ifemptyData() {
+        nonDataWarning = new BookmarkActivity.NonDataWarning();
+        ButterKnife.bind(nonDataWarning, warningLayout);
+        reviewRecycler.setVisibility(View.INVISIBLE);
+        warningLayout.setVisibility(View.VISIBLE);
+        nonDataWarning.warningText.setText("등록된 후기가 없습니다.");
+    }
+
+    private void checkUserStatus() {
+        if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) == RESULT_OWNER)
+            commentItem.setVisibility(View.GONE);
+
     }
 
     private void getReviewList() {
-        String token = SharedPreferencesService.getInstance().getPrefStringData("auth_token");
+        String token = SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN);
         if (token.equals(""))
             token = "nonLoginUser";
 
@@ -96,16 +155,23 @@ public class ReviewActivity extends WhiteThemeActivity {
             @Override
             public void onResponse(Call<ResReview> call, Response<ResReview> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success")) {
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         reviewList = response.body().getResult().getReviews();
                         reviewRecyclerAdapter.refreshAdapter(reviewList);
+
+                        if (reviewList.size() == 0)
+                            ifemptyData();
+                        else {
+                            reviewRecycler.setVisibility(View.VISIBLE);
+                            warningLayout.setVisibility(View.INVISIBLE);
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<ResReview> call, Throwable t) {
-
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
@@ -132,18 +198,17 @@ public class ReviewActivity extends WhiteThemeActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(ReviewActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(ReviewActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
         };
 
         TedPermission.with(this)
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setRationaleMessage("에브리푸디를 100% 이용하기 위한 권한을 주세요!!")
+                .setDeniedMessage("왜 거부하셨어요...\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
                 .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
@@ -179,15 +244,14 @@ public class ReviewActivity extends WhiteThemeActivity {
 
         }
 
-        Call<BaseModel> registerReview = networkService.registerReview(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),
+        Call<BaseModel> registerReview = networkService.registerReview(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN),
                 body, storeId, score, content);
 
         registerReview.enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success")) {
-                        ToastMaker.makeShortToast(getApplicationContext(), "성공");
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         getReviewList();
                         reviewDialog.dismiss();
                         commentEdit.setText("");
@@ -198,18 +262,23 @@ public class ReviewActivity extends WhiteThemeActivity {
 
             @Override
             public void onFailure(Call<BaseModel> call, Throwable t) {
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
 
     @OnClick(R.id.comment_register_btn)
     public void onClickRegisterReview(View view) {
-        if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST) {
+        if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) != RESULT_GUEST) {
+            ToastMaker.makeShortToast(getApplicationContext(), "로그인이 필요한 기능입니다.");
             Intent needLogin = new Intent(this, LoginActivity.class);
             startActivity(needLogin);
         } else {
-            reviewDialog = new ReviewDialog(this, yesClickListener);
-            reviewDialog.show();
+            if (commentEdit.length() != 0) {
+                reviewDialog = new ReviewDialog(this, yesClickListener);
+                reviewDialog.show();
+            } else
+                ToastMaker.makeShortToast(getApplicationContext(), "후기 내용 또는 사진을 추가해주세요");
         }
 
     }
@@ -217,7 +286,7 @@ public class ReviewActivity extends WhiteThemeActivity {
     public View.OnClickListener yesClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            rating = String.valueOf(((RatingBar)reviewDialog.findViewById(R.id.regiter_review_rating)).getRating()*2);
+            rating = String.valueOf(((RatingBar) reviewDialog.findViewById(R.id.regiter_review_rating)).getRating() * 2);
             registerReview();
         }
     };
@@ -267,5 +336,11 @@ public class ReviewActivity extends WhiteThemeActivity {
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        getReviewList();
+        reviewRefreshLayout.setRefreshing(false);
     }
 }

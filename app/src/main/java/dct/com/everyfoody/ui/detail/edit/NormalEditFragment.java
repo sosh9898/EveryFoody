@@ -8,13 +8,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -34,6 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.StoreInfo;
@@ -50,20 +51,30 @@ import static android.R.attr.maxHeight;
 import static android.R.attr.maxWidth;
 import static android.app.Activity.RESULT_OK;
 import static com.facebook.FacebookSdk.getCacheDir;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 
 /**
  * Created by jyoung on 2017. 10. 4..
  */
 
 public class NormalEditFragment extends Fragment {
-    @BindView(R.id.edit_operation_time)EditText operationEdit;
-    @BindView(R.id.edit_break_time)EditText breakTiemEdit;
-    @BindView(R.id.edit_hashtag)EditText hashtagEdit;
-    @BindView(R.id.edit_phone_number)EditText phoneNumEdit;
-    @BindView(R.id.edit_facebook_url)EditText facebookEdit;
-    @BindView(R.id.edit_twitter_url)EditText twitterEdit;
-    @BindView(R.id.edit_instagram_url)EditText instagramEdit;
-    @BindView(R.id.edit_main_image)ImageView mainImage;
+    @BindView(R.id.edit_operation_time)
+    EditText operationEdit;
+    @BindView(R.id.edit_break_time)
+    EditText breakTiemEdit;
+    @BindView(R.id.edit_hashtag)
+    EditText hashtagEdit;
+    @BindView(R.id.edit_phone_number)
+    EditText phoneNumEdit;
+    @BindView(R.id.edit_facebook_url)
+    EditText facebookEdit;
+    @BindView(R.id.edit_twitter_url)
+    EditText twitterEdit;
+    @BindView(R.id.edit_instagram_url)
+    EditText instagramEdit;
+    @BindView(R.id.edit_main_image)
+    ImageView mainImage;
 
     private StoreInfo.BasicInfo basicInfo;
     private NetworkService networkService;
@@ -71,12 +82,12 @@ public class NormalEditFragment extends Fragment {
     private Uri tempUri;
     private File[] files;
 
-    public static final int THUMBNAIL_CROP = 1000;
+    public final static int THUMBNAIL_CROP = 1000;
 
     public NormalEditFragment() {
     }
 
-    public static NormalEditFragment getInstance(Bundle bundle){
+    public static NormalEditFragment getInstance(Bundle bundle) {
         NormalEditFragment normalEditFragment = new NormalEditFragment();
         normalEditFragment.setArguments(bundle);
         return normalEditFragment;
@@ -89,7 +100,7 @@ public class NormalEditFragment extends Fragment {
         ButterKnife.bind(this, view);
         networkService = ApplicationController.getInstance().getNetworkService();
         SharedPreferencesService.getInstance().load(getContext());
-        if(getArguments() != null){
+        if (getArguments() != null) {
             Gson gson = new Gson();
             basicInfo = gson.fromJson(getArguments().getString("basic"), StoreInfo.BasicInfo.class);
         }
@@ -100,11 +111,11 @@ public class NormalEditFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         initInfo();
+        phoneNumEdit.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
     }
 
-    private void initInfo(){
+    private void initInfo() {
         operationEdit.setText(basicInfo.getStoreOpentime());
         breakTiemEdit.setText(basicInfo.getStoreBreaktime());
         hashtagEdit.setText(basicInfo.getStoreHashtag());
@@ -115,7 +126,7 @@ public class NormalEditFragment extends Fragment {
         Glide.with(getContext()).load(basicInfo.getStoreImage()).into(mainImage);
     }
 
-    public StoreInfo.BasicInfo getEditInfo(){
+    public StoreInfo.BasicInfo getEditInfo() {
         basicInfo.setStoreBreaktime(breakTiemEdit.getText().toString());
         basicInfo.setStoreOpentime(operationEdit.getText().toString());
         basicInfo.setStoreHashtag(hashtagEdit.getText().toString());
@@ -128,13 +139,13 @@ public class NormalEditFragment extends Fragment {
     }
 
     @OnClick(R.id.edit_main_image_picker)
-    public void selectImage(View view){
+    public void selectImage(View view) {
         checkPermission();
         getImage();
 
     }
 
-    private void modifyImage(){
+    private void modifyImage() {
         MultipartBody.Part[] body = new MultipartBody.Part[2];
         files = new File[body.length];
 
@@ -171,15 +182,15 @@ public class NormalEditFragment extends Fragment {
             }
         }
 
-        Call<BaseModel> editMainImageCall = networkService.modifyStoreImage(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), body);
+        Call<BaseModel> editMainImageCall = networkService.modifyStoreImage(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), body);
 
         editMainImageCall.enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getStatus().equals("success")){
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         Glide.with(mainImage.getContext())
-                                .load(resultUri[0])
+                                .load(resultUri[1])
                                 .into(mainImage);
                     }
                 }
@@ -187,19 +198,17 @@ public class NormalEditFragment extends Fragment {
 
             @Override
             public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                LogUtil.d(getContext(), t.toString());
             }
         });
     }
 
-    private void getImage(){
+    private void getImage() {
         TedBottomPicker tedBottomPicker = new TedBottomPicker.Builder(getActivity())
                 .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
                     @Override
                     public void onImageSelected(Uri uri) {
                         tempUri = uri;
-                        Log.d("tempUri", tempUri.toString());
-
                         cropImage(uri);
                     }
                 })
@@ -228,29 +237,28 @@ public class NormalEditFragment extends Fragment {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(getContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(getContext(), "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
         };
 
         TedPermission.with(getContext())
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setRationaleMessage("에브리푸디를 100% 이용하기 위한 권한을 주세요!!")
+                .setDeniedMessage("왜 거부하셨어요...\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
                 .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
 
-    private void thumbnailCrop(){
+    private void thumbnailCrop() {
         UCrop.Options options = new UCrop.Options();
         options.setToolbarColor(getResources().getColor(R.color.colorAccent));
         options.setToolbarTitle("사진 편집");
         options.setStatusBarColor(getResources().getColor(R.color.colorAccent));
 
-        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), "thumbnail"+tempUri.toString().substring(tempUri.toString().lastIndexOf('/') + 1)));
+        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), "thumbnail" + tempUri.toString().substring(tempUri.toString().lastIndexOf('/') + 1)));
 
 
         UCrop.of(tempUri, mDestinationUri)
@@ -264,13 +272,12 @@ public class NormalEditFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK ) {
-            if(requestCode == UCrop.REQUEST_CROP) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == UCrop.REQUEST_CROP) {
                 final Uri cropUri = UCrop.getOutput(data);
                 resultUri[1] = cropUri;
                 thumbnailCrop();
-            }
-            else if(requestCode == THUMBNAIL_CROP){
+            } else if (requestCode == THUMBNAIL_CROP) {
                 final Uri cropUri = UCrop.getOutput(data);
                 resultUri[0] = cropUri;
                 modifyImage();
@@ -278,5 +285,11 @@ public class NormalEditFragment extends Fragment {
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 }

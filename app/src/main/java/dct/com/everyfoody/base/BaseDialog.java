@@ -1,4 +1,4 @@
-package dct.com.everyfoody.ui.detail;
+package dct.com.everyfoody.base;
 
 /**
  * Created by jyoung on 2017. 8. 12..
@@ -20,18 +20,22 @@ import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.request.NetworkService;
 
 
-public class ReserveDialog extends Dialog {
+public class BaseDialog extends Dialog {
 
     private NetworkService networkService;
-    private int storeId;
     private View.OnClickListener onClickListener;
+    private String dialogContent;
 
-    @BindView(R.id.reserve_yes)TextView reserveYes;
+    @BindView(R.id.dialog_yes)TextView yesBtn;
+    @BindView(R.id.dialog_text)TextView dialogText;
 
-    public ReserveDialog(Context context, View.OnClickListener onClickListener) {
+    public BaseDialog(Context context, View.OnClickListener onClickListener, String dialogContent) {
         super(context, android.R.style.Theme_Translucent_NoTitleBar);
         this.onClickListener = onClickListener;
+        this.dialogContent = dialogContent;
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +49,11 @@ public class ReserveDialog extends Dialog {
         networkService = ApplicationController.getInstance().getNetworkService();
         SharedPreferencesService.getInstance().load(getContext());
 
-        reserveYes.setOnClickListener(onClickListener);
+        dialogText.setText(dialogContent);
+        yesBtn.setOnClickListener(onClickListener);
     }
 
-    @OnClick(R.id.reserve_no)
+    @OnClick(R.id.dialog_no)
     void noClick(View view){
         this.dismiss();
     }

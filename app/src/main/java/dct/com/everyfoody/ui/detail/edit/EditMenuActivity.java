@@ -7,14 +7,12 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -34,9 +32,11 @@ import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
+import dct.com.everyfoody.model.EditMenu;
 import dct.com.everyfoody.model.StoreInfo;
 import dct.com.everyfoody.request.NetworkService;
 import gun0912.tedbottompicker.TedBottomPicker;
@@ -51,6 +51,9 @@ import static android.R.attr.maxHeight;
 import static android.R.attr.maxWidth;
 import static dct.com.everyfoody.ui.detail.edit.EditActivity.MENU_ADD;
 import static dct.com.everyfoody.ui.detail.edit.EditActivity.MENU_EDIT;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
+
 
 public class EditMenuActivity extends WhiteThemeActivity {
     @BindView(R.id.edit_menu_toolbar)Toolbar editToolbar;
@@ -61,8 +64,11 @@ public class EditMenuActivity extends WhiteThemeActivity {
 
     private Uri resultUri;
     private NetworkService networkService;
-    private int flag, menuId;
+    private int flag, menuId, imageEditFlag;
     private StoreInfo.MenuInfo menuInfo;
+
+    private final int IMAGE_EDIT = 1301;
+    private final int IMAGE_NON_EDIT = 1302;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +86,7 @@ public class EditMenuActivity extends WhiteThemeActivity {
         networkService = ApplicationController.getInstance().getNetworkService();
         Intent getData = getIntent();
         flag = getData.getExtras().getInt("addORedit");
+        imageEditFlag = IMAGE_NON_EDIT;
         if(flag == MENU_EDIT){
             Gson gson = new Gson();
             menuInfo = gson.fromJson(getData.getExtras().getString("menuItem"), StoreInfo.MenuInfo.class);
@@ -164,16 +171,16 @@ public class EditMenuActivity extends WhiteThemeActivity {
 
         }
         if(flag == MENU_ADD) {
-
-            Log.d("???","ADD");
-            Call<BaseModel> menuAddCall = networkService.registerMenu(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), body, name, price);
+            Call<BaseModel> menuAddCall = networkService.registerMenu(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), body, name, price);
 
             menuAddCall.enqueue(new Callback<BaseModel>() {
                 @Override
                 public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                     if (response.isSuccessful()) {
-                        if (response.body().getStatus().equals("success")) {
-                            ToastMaker.makeShortToast(getApplicationContext(), "추가 완료");
+                        if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
+                            ToastMaker.makeShortToast(getApplicationContext(), "메뉴가 추가되었습니다.");
+                            Intent intent = new Intent();
+                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     }
@@ -181,33 +188,61 @@ public class EditMenuActivity extends WhiteThemeActivity {
 
                 @Override
                 public void onFailure(Call<BaseModel> call, Throwable t) {
-                    Log.d("???","ADD" + t.toString());
-
+                    LogUtil.d(getApplicationContext(), t.toString());
                 }
             });
         }
         else if(flag == MENU_EDIT){
-            Log.d("???","edit");
+            if(imageEditFlag == IMAGE_EDIT) {
 
-            Call<BaseModel> menuEditCall = networkService.editMenu(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),menuId, body, name, price);
+                Call<BaseModel> menuEditCall = networkService.editMenu(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), menuId, body, name, price);
 
-            menuEditCall.enqueue(new Callback<BaseModel>() {
-                @Override
-                public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                    if(response.isSuccessful()){
-                        if(response.body().getStatus().equals("success")) {
-                            ToastMaker.makeShortToast(getApplicationContext(), "수정 완료");
-                            finish();
+                menuEditCall.enqueue(new Callback<BaseModel>() {
+                    @Override
+                    public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
+                                ToastMaker.makeShortToast(getApplicationContext(), "메뉴가 수정되었습니다.");
+                                Intent intent = new Intent();
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<BaseModel> call, Throwable t) {
-                    Log.d("???","edit" + t.toString());
+                    @Override
+                    public void onFailure(Call<BaseModel> call, Throwable t) {
+                        LogUtil.d(getApplicationContext(), t.toString());
+                    }
+                });
+            }
+            else if(imageEditFlag == IMAGE_NON_EDIT){
+                EditMenu editMenu = new EditMenu();
+                editMenu.setMenuImage(menuInfo.getMenuImageURL());
+                editMenu.setMenuName(menuName.getText().toString());
+                editMenu.setMenuPrice(menuPrice.getText().toString());
 
-                }
-            });
+                Call<BaseModel> menuEditCall = networkService.editMenuNoimage(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN)
+                ,menuInfo.getMenuID(), editMenu);
+
+                menuEditCall.enqueue(new Callback<BaseModel>() {
+                    @Override
+                    public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
+                                Intent intent = new Intent();
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseModel> call, Throwable t) {
+                        LogUtil.d(getApplicationContext(), t.toString());
+                    }
+                });
+            }
         }
 
 
@@ -237,7 +272,7 @@ public class EditMenuActivity extends WhiteThemeActivity {
 
         UCrop.of(tempUri, mDestinationUri)
                 .withOptions(options)
-                .withAspectRatio(2.8f, 1.1f)
+                .withAspectRatio(3.6f, 1.5f)
                 .withMaxResultSize(maxWidth, maxHeight)
                 .start(this);
     }
@@ -248,18 +283,17 @@ public class EditMenuActivity extends WhiteThemeActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(EditMenuActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(EditMenuActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
         };
 
         TedPermission.with(this)
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setRationaleMessage("에브리푸디를 100% 이용하기 위한 권한을 주세요!!")
+                .setDeniedMessage("왜 거부하셨어요...\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
                 .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
@@ -273,6 +307,7 @@ public class EditMenuActivity extends WhiteThemeActivity {
             Glide.with(menuImage.getContext())
                     .load(resultUri)
                     .into(menuImage);
+            imageEditFlag = IMAGE_EDIT;
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
         }

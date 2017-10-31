@@ -20,13 +20,17 @@ import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.OrangeThemeActivity;
 import dct.com.everyfoody.model.Reservation;
+import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 
 public class ReserveCancelActivity extends OrangeThemeActivity {
     @BindView(R.id.reservation_cancel_toolbar)
     Toolbar reservationToolbar;
     @BindView(R.id.reservation_cancel_rcv)
     RecyclerView reserveRecycler;
+    @BindView(R.id.warning_layout)
+    View warningLayout;
 
+    private BookmarkActivity.NonDataWarning nonDataWarning;
     private ReserveRecyclerAdapter reserveRecyclerAdapter;
     private List<Reservation.Store> reservationList;
 
@@ -42,9 +46,17 @@ public class ReserveCancelActivity extends OrangeThemeActivity {
 
     }
 
+    private void ifemptyData() {
+        nonDataWarning = new BookmarkActivity.NonDataWarning();
+        ButterKnife.bind(nonDataWarning, warningLayout);
+        reserveRecycler.setVisibility(View.INVISIBLE);
+        warningLayout.setVisibility(View.VISIBLE);
+        nonDataWarning.warningText.setText("예약내역이 없습니다.");
+    }
+
     private void setRecycler() {
         reserveRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        reserveRecyclerAdapter = new ReserveRecyclerAdapter(reservationList, onClickListener, getApplicationContext());
+        reserveRecyclerAdapter = new ReserveRecyclerAdapter(reservationList, onClickListener, getApplicationContext(), this);
         reserveRecycler.setAdapter(reserveRecyclerAdapter);
     }
 
@@ -65,6 +77,14 @@ public class ReserveCancelActivity extends OrangeThemeActivity {
 
         reservationList = new Gson().fromJson(getList.getExtras().getString("reservationList"), new TypeToken<List<Reservation.Store>>() {
         }.getType());
+
+        if (reservationList.size() == 0)
+            ifemptyData();
+        else {
+            reserveRecycler.setVisibility(View.VISIBLE);
+            warningLayout.setVisibility(View.INVISIBLE);
+        }
+
         reserveRecyclerAdapter.refreshAdapter(reservationList);
 
     }
@@ -96,7 +116,6 @@ public class ReserveCancelActivity extends OrangeThemeActivity {
         MenuItem deleteIc = menu.findItem(R.id.menu_delete);
 
         deleteIc.setVisible(false);
-
 
         return super.onPrepareOptionsMenu(menu);
     }

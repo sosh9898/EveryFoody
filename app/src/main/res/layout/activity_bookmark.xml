@@ -40,4 +40,11 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/layout_main_rcv_item"></android.support.v7.widget.RecyclerView>
 
+
+    <include
+        android:id="@+id/warning_layout"
+        layout="@layout/layout_non_data_warning"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 </android.support.design.widget.CoordinatorLayout>

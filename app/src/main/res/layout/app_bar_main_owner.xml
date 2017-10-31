@@ -37,6 +37,7 @@
         >
 
         <TextView
+            android:id="@+id/owner_main_text"
             android:layout_marginTop="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,6 +50,7 @@
             />
 
         <LinearLayout
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:id="@+id/open_store"
             android:layout_marginTop="43dp"
             android:layout_width="305dp"
@@ -58,12 +60,14 @@
             android:background="@drawable/owner_home_background">
 
             <ImageView
+                android:id="@+id/open_store_image"
                 android:layout_marginTop="23dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="14dp"
+                android:layout_height="20dp"
                 android:src="@drawable/open"/>
 
             <TextView
+                android:id="@+id/open_store_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="9dp"
@@ -76,6 +80,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:id="@+id/my_store"
             android:layout_marginTop="13dp"
             android:layout_width="305dp"
@@ -104,6 +109,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:id="@+id/check_turn"
             android:layout_marginTop="13dp"
             android:layout_width="305dp"

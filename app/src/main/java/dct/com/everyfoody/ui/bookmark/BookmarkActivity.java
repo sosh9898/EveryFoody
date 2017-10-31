@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.MainList;
@@ -23,15 +26,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static dct.com.everyfoody.ui.detail.location.MapActivity.DEFAULT_LAT;
+import static dct.com.everyfoody.ui.detail.location.MapActivity.DEFAULT_LNG;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
+
 public class BookmarkActivity extends WhiteThemeActivity {
     @BindView(R.id.bookmark_toolbar)
     Toolbar bookmarkToolbar;
     @BindView(R.id.bookmark_rcv)
     RecyclerView bookmarkRecycler;
+    @BindView(R.id.warning_layout)
+    View warningLayout;
 
     private NetworkService networkService;
     private List<MainList.TruckList> bookmarkList;
     private BookmarkRecyclerAdapter bookmarkRecyclerAdapter;
+    private NonDataWarning nonDataWarning;
+    private double lat, lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,28 +55,37 @@ public class BookmarkActivity extends WhiteThemeActivity {
         setToolbar();
         setRecycler();
         getBookmarkList();
-
-
     }
 
+
     private void getBookmarkList() {
-        Call<MainList> bookmarkListCall = networkService.getBookmarkList(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), 44, 44);
+        if (TextUtils.isEmpty(SharedPreferencesService.getInstance().getPrefStringData("lat"))) {
+            lat = DEFAULT_LAT;
+            lng = DEFAULT_LNG;
+        } else {
+            lat = Double.valueOf(SharedPreferencesService.getInstance().getPrefStringData("lat"));
+            lng = Double.valueOf(SharedPreferencesService.getInstance().getPrefStringData("lng"));
+        }
+
+        Call<MainList> bookmarkListCall = networkService.getBookmarkList(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), lat, lng);
 
         bookmarkListCall.enqueue(new Callback<MainList>() {
             @Override
             public void onResponse(Call<MainList> call, Response<MainList> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success")) {
-                        bookmarkList = response.body().getTruckLists();
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
+                        bookmarkList = response.body().getData().getTruckLists();
                         bookmarkRecyclerAdapter.refreshAdapter(bookmarkList);
 
+                        if (bookmarkList.size() == 0)
+                            ifemptyData();
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<MainList> call, Throwable t) {
-
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
 
@@ -98,4 +119,17 @@ public class BookmarkActivity extends WhiteThemeActivity {
             startActivity(detailIntent);
         }
     };
+
+    public static class NonDataWarning {
+        @BindView(R.id.non_data_warning_text)
+        public TextView warningText;
+    }
+
+    private void ifemptyData() {
+        nonDataWarning = new NonDataWarning();
+        ButterKnife.bind(nonDataWarning, warningLayout);
+        bookmarkRecycler.setVisibility(View.INVISIBLE);
+        warningLayout.setVisibility(View.VISIBLE);
+        nonDataWarning.warningText.setText("새로운 알림이 없습니다.");
+    }
 }

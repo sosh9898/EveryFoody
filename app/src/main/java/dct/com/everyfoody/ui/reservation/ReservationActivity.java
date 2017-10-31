@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,22 +18,29 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.global.ApplicationController;
 import dct.com.everyfoody.model.Reservation;
 import dct.com.everyfoody.request.NetworkService;
+import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.detail.DetailActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
+
 public class ReservationActivity extends WhiteThemeActivity {
     @BindView(R.id.reservation_toolbar)Toolbar reservationToolbar;
     @BindView(R.id.reservation_rcv)RecyclerView reserveRecycler;
+    @BindView(R.id.warning_layout)View warningLayout;
 
     private ReserveRecyclerAdapter reserveRecyclerAdapter;
     private List<Reservation.Store> reservationList;
     private NetworkService networkService;
+    private BookmarkActivity.NonDataWarning nonDataWarning;
 
 
 
@@ -52,9 +58,16 @@ public class ReservationActivity extends WhiteThemeActivity {
 
     }
 
+    private void ifemptyData(){
+        nonDataWarning = new BookmarkActivity.NonDataWarning();
+        ButterKnife.bind(nonDataWarning, warningLayout);
+        reserveRecycler.setVisibility(View.INVISIBLE);
+        warningLayout.setVisibility(View.VISIBLE);
+        nonDataWarning.warningText.setText("예약내역이 없습니다.");
+    }
     private void setRecycler(){
         reserveRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        reserveRecyclerAdapter = new ReserveRecyclerAdapter(reservationList, onClickListener);
+        reserveRecyclerAdapter = new ReserveRecyclerAdapter(reservationList, onClickListener, this);
         reserveRecycler.setAdapter(reserveRecyclerAdapter);
     }
 
@@ -71,22 +84,29 @@ public class ReservationActivity extends WhiteThemeActivity {
     }
 
     private void getReservationList(){
-        Call<Reservation> reservationCall = networkService.getReservationList(SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
+        Call<Reservation> reservationCall = networkService.getReservationList(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN));
 
         reservationCall.enqueue(new Callback<Reservation>() {
             @Override
             public void onResponse(Call<Reservation> call, Response<Reservation> response) {
                 if(response.isSuccessful()){
-                    if(response.body().getStatus().equals("success")){
+                    if(response.body().getStatus().equals(NETWORK_SUCCESS)){
                         reservationList = response.body().getStore();
                         reserveRecyclerAdapter.refreshAdapter(reservationList);
+
+                        if(reservationList.size() == 0)
+                            ifemptyData();
+                        else {
+                            reserveRecycler.setVisibility(View.VISIBLE);
+                            warningLayout.setVisibility(View.INVISIBLE);
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<Reservation> call, Throwable t) {
-                Log.d("d????", t.toString());
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
@@ -137,4 +157,9 @@ public class ReservationActivity extends WhiteThemeActivity {
         }
     };
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getReservationList();
+    }
 }

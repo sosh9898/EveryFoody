@@ -2,9 +2,13 @@ package dct.com.everyfoody.request;
 
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.model.CheckId;
+import dct.com.everyfoody.model.EditMenu;
 import dct.com.everyfoody.model.Login;
 import dct.com.everyfoody.model.MainList;
+import dct.com.everyfoody.model.Menu;
+import dct.com.everyfoody.model.Notification;
 import dct.com.everyfoody.model.OpenLocation;
+import dct.com.everyfoody.model.RegisterStore;
 import dct.com.everyfoody.model.ResLocation;
 import dct.com.everyfoody.model.ResReview;
 import dct.com.everyfoody.model.Reservation;
@@ -12,6 +16,7 @@ import dct.com.everyfoody.model.SideMenu;
 import dct.com.everyfoody.model.StoreInfo;
 import dct.com.everyfoody.model.Turn;
 import dct.com.everyfoody.model.UserInfo;
+import dct.com.everyfoody.model.UserStatus;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -35,9 +40,13 @@ public interface NetworkService {
     @POST("/signin")
     Call<Login> userLogin(@Body UserInfo userInfo);
 
-    //회원가입
+    //회원가입(이용자)
     @POST("/signup/customer")
     Call<BaseModel> userSignUp(@Body UserInfo userInfo);
+
+    //회원가입(사용자)
+    @POST("/signup/owner")
+    Call<BaseModel> ownerSignUp(@Body UserInfo ownerInfo);
 
     //메인
     @GET("/main/lists/{location}/{latitude}/{longitude}")
@@ -61,7 +70,7 @@ public interface NetworkService {
 
     //즐겨찾기 리스트
     @GET("/bookmark/lists/{latitude}/{longitude}")
-    Call<MainList> getBookmarkList(@Header("token") String token, @Path("latitude") int lat, @Path("longitude") int log);
+    Call<MainList> getBookmarkList(@Header("token") String token, @Path("latitude") double lat, @Path("longitude") double log);
 
     //리뷰 리스트
     @GET("/review/lists/{storeID}")
@@ -72,9 +81,9 @@ public interface NetworkService {
     @POST("/review/registration")
     Call<BaseModel> registerReview(@Header("token") String token,
                                    @Part MultipartBody.Part files,
-                                    @Part("storeID") RequestBody storeId,
-                                    @Part("score") RequestBody score,
-                                    @Part("content") RequestBody content);
+                                   @Part("storeID") RequestBody storeId,
+                                   @Part("score") RequestBody score,
+                                   @Part("content") RequestBody content);
 
     //가게 위치
     @GET("/store/location/{storeID}")
@@ -84,8 +93,12 @@ public interface NetworkService {
     @PUT("/management/registration/opening")
     Call<BaseModel> openStore(@Header("token") String token, @Body OpenLocation openLocation);
 
+    //가게 닫기
+    @PUT("/management/registration/closing")
+    Call<BaseModel> closeStore(@Header("token") String token);
+
     //내 가게 정보
-    @GET("/management/myinfo/modification")
+    @GET("/management/ownerinfo/basicinfo")
     Call<StoreInfo> getMyStoreInfo(@Header("token") String token);
 
     //예약 현황(사업자)
@@ -94,7 +107,7 @@ public interface NetworkService {
 
     //메뉴 추가
     @Multipart
-    @PUT("/management/myinfo/menu/addition")
+    @PUT("/management/menuinfo/addition")
     Call<BaseModel> registerMenu(@Header("token") String token,
                                  @Part MultipartBody.Part file,
                                  @Part("menu_name") RequestBody menuName,
@@ -102,15 +115,19 @@ public interface NetworkService {
 
     //메뉴 수정
     @Multipart
-    @PUT("/management/myinfo/menu/modification/{menu_id}")
+    @PUT("/management/menuinfo/modification/{menu_id}")
     Call<BaseModel> editMenu(@Header("token") String token,
                                  @Path("menu_id") int menuId,
                                  @Part MultipartBody.Part file,
                                  @Part("menu_name") RequestBody menuName,
                                  @Part("menu_price") RequestBody menuPrice);
 
+    //메뉴 수정 (텍스트만)
+    @POST("/management/menuinfo/modification/{menu_id}")
+    Call<BaseModel> editMenuNoimage(@Header("token") String token,@Path("menu_id") int menuId, @Body EditMenu editMenu);
+
     //메뉴 삭제
-    @DELETE("/management/myinfo/menu/remove/{menu_id}")
+    @DELETE("/management/menuinfo/remove/{menu_id}")
     Call<BaseModel> deleteMenu(@Header("token") String token, @Path("menu_id") int menuId);
 
     //사이드 메뉴
@@ -134,28 +151,53 @@ public interface NetworkService {
     Call<BaseModel> unCheckedToggleOwner(@Header("token") String token, @Path("kind") int kind);
 
     //아이디 체크
-    @GET("/signin/checking/{user_uid}")
+    @GET("/signup/checking/{user_uid}")
     Call<CheckId> checkId(@Path("user_uid") String uid);
 
     //프로필 수정
     @Multipart
-    @PUT("management/myprofile")
+    @PUT("/management/myprofile")
     Call<BaseModel> modifyProfile(@Header("token") String token,
                                   @Part MultipartBody.Part file);
 
     //순번 제거
-    @DELETE("management/customers/lists/remove")
+    @DELETE("/management/customers/lists/remove")
     Call<BaseModel> nextGuset(@Header("token") String token);
 
     //가게 대표 이미지 수정
     @Multipart
-    @PUT("management/myinfo/basic/imagemodi")
+    @PUT("/management/ownerinfo/imagemodi")
     Call<BaseModel> modifyStoreImage(@Header("token") String token,
                                      @Part MultipartBody.Part[] files);
 
     //가게 기본정보 수정
-    @POST("/management/myinfo/basic/modification")
+    @POST("/management/ownerinfo/basicmodi")
     Call<BaseModel> modifyBasicInfo(@Header("token") String token,
                                     @Body StoreInfo.BasicInfo basicInfo);
+
+    //알림 리스트
+    @PUT("/main/notice/lists")
+    Call<Notification> getNotiList(@Header("token") String token);
+
+    //가게 등록
+    @PUT("/management/registration/store")
+    Call<BaseModel> registerStore(@Header("token") String token, @Body RegisterStore registerStore);
+
+    //메뉴 리스트만
+    @GET("/management/menuinfo/lists")
+    Call<Menu> getMenuList(@Header("token") String token);
+
+    //라이센스 등록
+    @Multipart
+    @POST("/management/registration/store")
+    Call<BaseModel> registerLicense(@Header("token") String token,
+                                    @Part("store_name") RequestBody storeName,
+                                    @Part MultipartBody.Part file);
+
+    @GET("/management/check")
+    Call<UserStatus> getUserStatus(@Header("token") String token);
+
+    @PUT("/signout")
+    Call<BaseModel> logout(@Header("token") String token);
 
 }
