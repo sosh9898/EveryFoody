@@ -1,5 +1,6 @@
 package dct.com.everyfoody.ui.detail.edit;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
@@ -29,6 +31,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static dct.com.everyfoody.ui.detail.edit.EditActivity.MENU_EDIT;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 
 /**
  * Created by jyoung on 2017. 10. 4..
@@ -44,7 +48,7 @@ public class EditMenuRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void refreshAdapter(List<StoreInfo.MenuInfo> menuInfo) {
-        this.menuInfoList = menuInfoList;
+        this.menuInfoList = menuInfo;
         notifyDataSetChanged();
     }
 
@@ -100,29 +104,30 @@ public class EditMenuRecyclerAdapter extends RecyclerView.Adapter {
             Intent editIntent = new Intent(mContext, EditMenuActivity.class);
             editIntent.putExtra("addORedit", MENU_EDIT);
             editIntent.putExtra("menuItem", gson.toJson(menuInfoList.get(getAdapterPosition())));
-            mContext.startActivity(editIntent);
+            ((Activity)mContext).startActivityForResult(editIntent, MENU_EDIT);
         }
 
         @OnClick(R.id.edit_delete_icon)
         public void onClickDelete(final View view){
             final int tempPosition = getAdapterPosition();
 
-            Call<BaseModel> deleteCall = networkService.deleteMenu(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), menuInfoList.get(tempPosition).getMenuID());
+            Call<BaseModel> deleteCall = networkService.deleteMenu(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), menuInfoList.get(tempPosition).getMenuID());
 
             deleteCall.enqueue(new Callback<BaseModel>() {
                 @Override
                 public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                     if(response.isSuccessful()){
-                        if(response.body().getStatus().equals("success")){
+                        if(response.body().getStatus().equals(NETWORK_SUCCESS)){
                             menuInfoList.remove(tempPosition);
                             notifyDataSetChanged();
-                            ToastMaker.makeShortToast(view.getContext(), "삭제 성공");
+                            ToastMaker.makeShortToast(view.getContext(), "메뉴가 삭제되었습니다.");
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<BaseModel> call, Throwable t) {
+                    LogUtil.d(mContext, t.toString());
 
                 }
             });

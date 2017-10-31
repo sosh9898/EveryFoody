@@ -54,6 +54,7 @@
             android:background="@drawable/edittext_base">
 
             <EditText
+                android:maxLength="25"
                 android:id="@+id/menu_item_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -74,6 +75,8 @@
             android:background="@drawable/edittext_base">
 
             <EditText
+                android:inputType="number"
+                android:maxLength="7"
                 android:id="@+id/menu_item_price"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

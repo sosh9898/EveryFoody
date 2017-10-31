@@ -71,8 +71,14 @@ public class TruckRecyclerAdapter extends RecyclerView.Adapter {
         public void bindView(MainList.TruckList truckList){
             Glide.with(mainListImage.getContext()).load(truckList.getStoreImage()).into(mainListImage);
             foodTruckName.setText(truckList.getStoreName());
-            foodTruckDistance.setText(truckList.getStoreDistance()+truckList.getStoreDistanceUnit());
-            foodTruckBookerCount.setText("대기인원 "+truckList.getReservationCount()+"명");
+            if(truckList.getStoreDistance() == -1) {
+                foodTruckDistance.setText("오픈하지 않음");
+                foodTruckBookerCount.setText("대기인원 0명");
+            }
+            else {
+                foodTruckDistance.setText(truckList.getStoreDistance() + truckList.getStoreDistanceUnit());
+                foodTruckBookerCount.setText("대기인원 " + truckList.getReservationCount() + "명");
+            }
         }
 
 

@@ -24,7 +24,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +53,7 @@ import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.base.WhiteThemeActivity;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
@@ -62,9 +64,10 @@ import dct.com.everyfoody.ui.bookmark.BookmarkActivity;
 import dct.com.everyfoody.ui.detail.DetailActivity;
 import dct.com.everyfoody.ui.home.MapClipDataHelper;
 import dct.com.everyfoody.ui.home.owner.OwnerHomeActivity;
+import dct.com.everyfoody.ui.home.owner.nonauth.NonAuthOwnerActivity;
 import dct.com.everyfoody.ui.login.LoginActivity;
+import dct.com.everyfoody.ui.notification.NotifyActivity;
 import dct.com.everyfoody.ui.reservation.ReservationActivity;
-import dct.com.everyfoody.ui.signup.SignUpMainActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 import gun0912.tedbottompicker.TedBottomPicker;
 import okhttp3.MediaType;
@@ -74,19 +77,21 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NO_REG_STORE;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
-
+import static dct.com.everyfoody.ui.login.LoginActivity.USER_NAME;
+import static dct.com.everyfoody.ui.login.LoginActivity.USER_STATUS;
 
 public class MainActivity extends WhiteThemeActivity {
 
-    private static final int MAP_CLIP_COUNT = 8;
-    private static final int REQUEST_CODE_FOR_LOGIN = 201;
-    private static final int REQUEST_CODE_FOR_SIGNUP = 202;
-    public static final int TOGGLE_CHECKED = 501;
-    public static final int TOGGLE_UNCHECKED = 502;
+    private final static int MAP_CLIP_COUNT = 8;
+    private final static int REQUEST_CODE_FOR_LOGIN = 201;
+    public final static int TOGGLE_CHECKED = 501;
+    public final static int TOGGLE_UNCHECKED = 502;
 
     @BindView(R.id.main_fab)
     FloatingActionButton fab;
@@ -107,7 +112,7 @@ public class MainActivity extends WhiteThemeActivity {
     @BindView(R.id.my_location)
     ImageView myLocImage;
 
-    public static final String TAG = MainActivity.class.getSimpleName();
+    private final static String TAG = MainActivity.class.getSimpleName();
 
     private TruckRecyclerAdapter adapter;
     private SettingRecyclerAdapter settingAdapter;
@@ -121,11 +126,15 @@ public class MainActivity extends WhiteThemeActivity {
     private List<MainList.TruckList> truckLists;
     private List<SideMenu.BookMark> bookMarkList;
     private LocationManager locationManager;
+    private ActionBarDrawerToggle toggle;
     private double lat, lng;
     private String address;
+    private int notiFlag;
 
-    public static final int EXIST_NOTI = 802;
-    public static final int NONEXIST_NOTI = 801;
+    public final static int EXIST_NOTI = 802;
+    public final static int NONEXIST_NOTI = 801;
+    private final long FINSH_INTERVAL_TIME = 2000;
+    private long backPressedTime = 0;
 
 
     @Override
@@ -142,9 +151,7 @@ public class MainActivity extends WhiteThemeActivity {
         setRecycler();
         MapClipDataHelper.initialize();
         setFab();
-
-        Log.d("token", SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
-        Log.d("fcm", SharedPreferencesService.getInstance().getPrefStringData("fcm_token"));
+        checkUserStatus(SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS));
 
         mapClipTextViews = new TextView[MAP_CLIP_COUNT];
         mapClipImageViews = new ImageView[MAP_CLIP_COUNT];
@@ -196,7 +203,7 @@ public class MainActivity extends WhiteThemeActivity {
         ButterKnife.bind(defaultDrawer, drawerDefault);
         ButterKnife.bind(loggedDrawer, drawerLogged);
 
-        loggedDrawer.userName.setText(SharedPreferencesService.getInstance().getPrefStringData("user_name"));
+        loggedDrawer.userName.setText(SharedPreferencesService.getInstance().getPrefStringData(USER_NAME));
 
         View.OnClickListener loginClickListener = new View.OnClickListener() {
             @Override
@@ -208,21 +215,12 @@ public class MainActivity extends WhiteThemeActivity {
         };
         defaultDrawer.loginContainer.setOnClickListener(loginClickListener);
         defaultDrawer.pleaseLoginTextView.setOnClickListener(loginClickListener);
-        defaultDrawer.signUpContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent signUpIntent = new Intent(MainActivity.this, SignUpMainActivity.class);
-                startActivityForResult(signUpIntent, REQUEST_CODE_FOR_SIGNUP);
-            }
-        });
 
         //로그인 된 상태의 drawer
         loggedDrawer.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesService.getInstance().removeData("auth_token", "user_status");
-                drawerDefault.setVisibility(View.VISIBLE);
-                drawerLogged.setVisibility(View.GONE);
+                logout();
             }
         });
         loggedDrawer.bookMarkCountTextView.setOnClickListener(new View.OnClickListener() {
@@ -252,7 +250,32 @@ public class MainActivity extends WhiteThemeActivity {
         loggedDrawer.profileImageView.setOnClickListener(profileEditClickListener);
     }
 
-    private void getImage(){
+    private void logout() {
+        SharedPreferencesService.getInstance().removeData(AUTH_TOKEN, USER_STATUS);
+        drawerDefault.setVisibility(View.VISIBLE);
+        drawerLogged.setVisibility(View.GONE);
+//        Call<BaseModel> logoutCall = networkService.logout(SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
+//
+//        logoutCall.enqueue(new Callback<BaseModel>() {
+//            @Override
+//            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+//                if(response.isSuccessful()){
+//                    if(response.body().getStatus().equals("success")){
+//                        SharedPreferencesService.getInstance().removeData("auth_token", "user_status");
+//                        drawerDefault.setVisibility(View.VISIBLE);
+//                        drawerLogged.setVisibility(View.GONE);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<BaseModel> call, Throwable t) {
+//
+//            }
+//        });
+    }
+
+    private void getImage() {
         TedBottomPicker tedBottomPicker = new TedBottomPicker.Builder(MainActivity.this)
                 .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
                     @Override
@@ -292,23 +315,21 @@ public class MainActivity extends WhiteThemeActivity {
 
         }
 
-        Call<BaseModel> profileCall = networkService.modifyProfile(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),body);
+        Call<BaseModel> profileCall = networkService.modifyProfile(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), body);
 
         profileCall.enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getStatus().equals("success")) {
-                        ToastMaker.makeShortToast(getApplicationContext(), "성공");
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         Glide.with(getApplicationContext()).load(uri).into(loggedDrawer.profileImageView);
-
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
@@ -328,8 +349,9 @@ public class MainActivity extends WhiteThemeActivity {
     private void setToolbar() {
         guestToolbar.setTitle("");
         setSupportActionBar(guestToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, guestToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
             public void onDrawerStateChanged(int newState) {
@@ -349,7 +371,7 @@ public class MainActivity extends WhiteThemeActivity {
     }
 
     private void outoLogin() {
-        if (!SharedPreferencesService.getInstance().getPrefStringData("auth_token").equals("")) {
+        if (!SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN).equals("")) {
             drawerDefault.setVisibility(View.GONE);
             drawerLogged.setVisibility(View.VISIBLE);
 
@@ -359,41 +381,39 @@ public class MainActivity extends WhiteThemeActivity {
     }
 
     private void getMainData(int index) {
-        if (String.valueOf(lat) == null) {
+        if (lat == 0) {
             lat = 37.55;
             lng = 126.98;
         }
+        final String token = !SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN).equals("") ?
+                SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN) : "nonLoginUser";
 
-        Call<MainList> getMainList = networkService.getMainLists("nonLoginUser", index, lat, lng);
+        Call<MainList> getMainList = networkService.getMainLists(token, index, lat, lng);
         getMainList.enqueue(new Callback<MainList>() {
             @Override
             public void onResponse(Call<MainList> call, Response<MainList> response) {
                 if (response.isSuccessful()) {
                     mainList = response.body();
-                    if (mainList.getStatus().equals("success")) {
+                    if (mainList.getStatus().equals(NETWORK_SUCCESS)) {
                         truckLists = mainList.getData().getTruckLists();
                         adapter.refreshAdapter(truckLists);
-                        SharedPreferencesService.getInstance().setPrefData("user_token",response.body().getData().getUserToken());
-
+                        if (token == "nonLoginUser") {
+                            notiFlag = NONEXIST_NOTI;
+                        } else {
+                            SharedPreferencesService.getInstance().setPrefData(AUTH_TOKEN, response.body().getData().getUserToken());
+                            notiFlag = response.body().getData().getNoticeCode();
+                            invalidateOptionsMenu();
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<MainList> call, Throwable t) {
-                Log.e(TAG, "error : " + t.toString());
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -406,18 +426,10 @@ public class MainActivity extends WhiteThemeActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-//        if (id == R.id.menu_notify_false || id == R.id.menu_notify_true) {
-//            Intent notiIntent = new Intent(this, NotifyActivity.class);
-//            startActivity(notiIntent);
-//        }
-
-        /*FIXME
-        위에 주석 풀어주고 아래 지웁시다!!
-         */
-
-        if (id == R.id.menu_notify_true) {
+        if (id == R.id.menu_notify_false || id == R.id.menu_notify_true) {
+            Intent notiIntent = new Intent(this, NotifyActivity.class);
+            startActivity(notiIntent);
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -427,9 +439,13 @@ public class MainActivity extends WhiteThemeActivity {
         MenuItem notiTrue = menu.findItem(R.id.menu_notify_true);
         MenuItem notiFalse = menu.findItem(R.id.menu_notify_false);
 
-        /*TODO
-        알림이 있을 경우 false invisible  알림이 없을 경우 true invisible
-         */
+        if (SharedPreferencesService.getInstance().getPrefIntegerData("badgeCount") != 0 && !SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN).equals("")) {
+            notiTrue.setVisible(true);
+            notiFalse.setVisible(false);
+        } else {
+            notiTrue.setVisible(false);
+            notiFalse.setVisible(true);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -440,6 +456,7 @@ public class MainActivity extends WhiteThemeActivity {
             final int tempPosition = mainRecycler.getChildPosition(view);
             Intent detailIntent = new Intent(view.getContext(), DetailActivity.class);
             detailIntent.putExtra("storeId", truckLists.get(tempPosition).getStoreID());
+            detailIntent.putExtra("openStatus", truckLists.get(tempPosition).getStoreDistance());
             startActivity(detailIntent);
         }
     };
@@ -466,6 +483,9 @@ public class MainActivity extends WhiteThemeActivity {
     };
 
     private void checkMap(int key) {
+
+        if (lastClickedMapPosition == key)
+            return;
         ImageView clickedAreaImageView = mapClipImageViews[key - 1];
         TextView clickedAreaTextView = mapClipTextViews[key - 1];
         clickedAreaTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
@@ -479,6 +499,8 @@ public class MainActivity extends WhiteThemeActivity {
         getMainData(key);
 
         lastClickedMapPosition = key;
+
+        locationManager.removeUpdates(locationListener);
     }
 
     private void loginSuccess(Intent data) {
@@ -487,17 +509,28 @@ public class MainActivity extends WhiteThemeActivity {
 
         int loginResult = data.getIntExtra(LoginActivity.LOGIN_RESULT, -1);
 
-        switch (loginResult) {
+        checkUserStatus(loginResult);
+
+    }
+
+    private void checkUserStatus(int status) {
+        switch (status) {
             case RESULT_GUEST:
                 loggedDrawer.orderNameTextView.setText("예약내역");
                 loggedDrawer.pushListTextView.setText("즐겨찾기 푸시알람");
-                loggedDrawer.userName.setText(SharedPreferencesService.getInstance().getPrefStringData("user_name"));
+                loggedDrawer.userName.setText(SharedPreferencesService.getInstance().getPrefStringData(USER_NAME));
+                break;
+            case RESULT_NO_REG_STORE:
+            case RESULT_NON_AUTH_OWNER:
+                Intent nonAuthOwnerIntent = new Intent(this, NonAuthOwnerActivity.class);
+                startActivity(nonAuthOwnerIntent);
+                finish();
                 break;
             case RESULT_OWNER:
-            case RESULT_NON_AUTH_OWNER:
-            case EXPIRED_OWNER:
                 Intent ownerIntent = new Intent(this, OwnerHomeActivity.class);
                 startActivity(ownerIntent);
+                finish();
+                break;
         }
 
     }
@@ -505,7 +538,6 @@ public class MainActivity extends WhiteThemeActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case REQUEST_CODE_FOR_LOGIN:
                 if (resultCode == RESULT_OK) {
@@ -521,8 +553,6 @@ public class MainActivity extends WhiteThemeActivity {
     static class DefaultDrawer {
         @BindView(R.id.login_container)
         View loginContainer;
-        @BindView(R.id.signup_container)
-        View signUpContainer;
         @BindView(R.id.plz_login_text)
         TextView pleaseLoginTextView;
     }
@@ -552,34 +582,33 @@ public class MainActivity extends WhiteThemeActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
         };
 
         TedPermission.with(this)
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setRationaleMessage("에브리푸디를 100% 이용하기 위한 권한을 주세요!!")
+                .setDeniedMessage("왜 거부하셨어요...\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
                 .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
 
     private void openSideMenu() {
-        Call<SideMenu> sideMenuCall = networkService.getSideMenuInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"),
-                SharedPreferencesService.getInstance().getPrefIntegerData("user_status"));
+        Call<SideMenu> sideMenuCall = networkService.getSideMenuInfo(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN),
+                SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS));
 
         sideMenuCall.enqueue(new Callback<SideMenu>() {
             @Override
             public void onResponse(Call<SideMenu> call, Response<SideMenu> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success")) {
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         loggedDrawer.bookMarkCountTextView.setText(response.body().getSideInfo().getBmNum() + "");
                         loggedDrawer.orderCountTextView.setText(response.body().getSideInfo().getResNum() + "");
-                        if(response.body().getSideInfo().getImageUrl() != null)
+                        if (!TextUtils.isEmpty(response.body().getSideInfo().getImageUrl()))
                             Glide.with(getApplicationContext()).load(response.body().getSideInfo().getImageUrl()).into(loggedDrawer.profileImageView);
 
                         settingAdapter.refreshAdapter(response.body().getSideInfo().getBookMarkList());
@@ -589,7 +618,7 @@ public class MainActivity extends WhiteThemeActivity {
 
             @Override
             public void onFailure(Call<SideMenu> call, Throwable t) {
-                Log.d("????", t.toString());
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
@@ -611,43 +640,62 @@ public class MainActivity extends WhiteThemeActivity {
         locationManager.requestLocationUpdates(locationManager.getBestProvider(new Criteria(), true), 3000, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        ToastMaker.makeShortToast(getApplicationContext(), "click");
+        ToastMaker.makeShortToast(getApplicationContext(), "현재 위치를 조회중입니다.");
     }
 
     private void getMapKey(String address) {
         String str1 = address;
         String str2[] = str1.split(" ");
-        ToastMaker.makeShortToast(getApplicationContext(), "address : " + address);
 
+        if (!str2[1].equals("서울특별시"))
+            selectedAddressName.setText("서울시에 위치하고 있지않습니다.");
+        else
+            selectedAddressName.setText("서울시 " + str2[2]);
 
         switch (str2[2].substring(0, 2)) {
             case "강서":
+            case "양천":
+            case "영등":
+            case "구로":
                 checkMap(1);
                 break;
             case "은평":
+            case "마포":
+            case "서대":
                 checkMap(2);
                 break;
             case "종로":
+            case "중구":
+            case "용산":
                 checkMap(3);
                 break;
             case "도봉":
+            case "강북":
+            case "성북":
+            case "노원":
                 checkMap(4);
                 break;
             case "동대":
+            case "성동":
+            case "중랑":
+            case "광진":
                 checkMap(5);
                 break;
             case "동작":
+            case "관악":
+            case "금천":
                 checkMap(6);
                 break;
             case "서초":
+            case "강남":
                 checkMap(7);
                 break;
             case "강동":
+            case "송파":
                 checkMap(8);
                 break;
             default:
-                if (lastClickedMapPosition != 3)
-                    checkMap(3);
+                checkMap(3);
                 break;
         }
 
@@ -660,12 +708,9 @@ public class MainActivity extends WhiteThemeActivity {
             lat = location.getLatitude();
             lng = location.getLongitude();
             address = getAddress(getApplicationContext(), lat, lng);
-
-            Log.d("loc", lat + "   " + lng);
-
+            SharedPreferencesService.getInstance().setPrefData("lat", String.valueOf(lat));
+            SharedPreferencesService.getInstance().setPrefData("lng", String.valueOf(lng));
             getMapKey(address);
-
-            ToastMaker.makeShortToast(getApplicationContext(), "loc : " + location.toString());
             Glide.with(getApplicationContext()).load(R.drawable.my_location).into(myLocImage);
 
         }
@@ -690,17 +735,12 @@ public class MainActivity extends WhiteThemeActivity {
         try {
             if (geocoder != null) {
                 address = geocoder.getFromLocation(lat, lng, 1);
-
                 if (address != null && address.size() > 0) {
                     String currentLocationAddress = address.get(0).getAddressLine(0).toString();
                     nowAddress = currentLocationAddress;
-
                 }
             }
-
         } catch (IOException e) {
-            ToastMaker.makeShortToast(mContext, "실패");
-
             e.printStackTrace();
         }
         return nowAddress;
@@ -710,5 +750,26 @@ public class MainActivity extends WhiteThemeActivity {
     protected void onResume() {
         super.onResume();
         getMainData(lastClickedMapPosition);
+        openSideMenu();
+        outoLogin();
     }
+
+    @Override
+    public void onBackPressed() {
+        long tempTime = System.currentTimeMillis();
+        long intervalTime = tempTime - backPressedTime;
+        if (drawerLayout.isDrawerVisible(Gravity.START)) {
+            drawerLayout.closeDrawer(Gravity.START);
+        } else {
+
+            if (0 <= intervalTime && FINSH_INTERVAL_TIME >= intervalTime) {
+                finish();
+            } else {
+                backPressedTime = tempTime;
+                Toast.makeText(getApplicationContext(), "뒤로 가기 키을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
 }

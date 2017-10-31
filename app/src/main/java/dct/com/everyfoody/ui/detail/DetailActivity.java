@@ -2,11 +2,11 @@ package dct.com.everyfoody.ui.detail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +21,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dct.com.everyfoody.R;
+import dct.com.everyfoody.base.BaseDialog;
 import dct.com.everyfoody.base.BaseModel;
 import dct.com.everyfoody.base.OrangeThemeActivity;
 import dct.com.everyfoody.base.util.BundleBuilder;
+import dct.com.everyfoody.base.util.LogUtil;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.base.util.ToastMaker;
 import dct.com.everyfoody.global.ApplicationController;
@@ -38,10 +40,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
+import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NO_REG_STORE;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.USER_STATUS;
 
 public class DetailActivity extends OrangeThemeActivity {
     @BindView(R.id.detail_toolbar)
@@ -55,14 +60,22 @@ public class DetailActivity extends OrangeThemeActivity {
     @BindView(R.id.review_btn)
     LinearLayout reviewBtn;
 
-    public static final String TAG = DetailActivity.class.getSimpleName();
+    public final static String TAG = DetailActivity.class.getSimpleName();
+    public final static int EDIT_COMPLETE = 70;
+    public final static int CHECK_MAP = 71;
+    public final static int EXIST_RESERVATION = 603;
+    public final static int NON_EXIST_RESERVATION = 604;
+    public final static int EXIST_BOOKMARK = 605;
+    public final static int NON_EXIST_BOOKMARK = 606;
+
 
     private int storeId;
+    private float openStatus;
     private NetworkService networkService;
     private StoreInfo storeInfo;
     private int bookmarkFlag;
     private int userStatus;
-    private ReserveDialog reserveDialog;
+    private BaseDialog baseDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +85,7 @@ public class DetailActivity extends OrangeThemeActivity {
         SharedPreferencesService.getInstance().load(this);
         networkService = ApplicationController.getInstance().getNetworkService();
 
-        userStatus = SharedPreferencesService.getInstance().getPrefIntegerData("user_status");
+        userStatus = SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS);
         switch (userStatus) {
             case RESULT_GUEST:
                 getInitData();
@@ -80,7 +93,7 @@ public class DetailActivity extends OrangeThemeActivity {
                 break;
             case RESULT_OWNER:
             case RESULT_NON_AUTH_OWNER:
-            case EXPIRED_OWNER:
+            case RESULT_NO_REG_STORE:
                 getMyStoreInfo();
                 break;
             default:
@@ -92,13 +105,13 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
     private void getMyStoreInfo() {
-        final Call<StoreInfo> getMyStoreInfo = networkService.getMyStoreInfo(SharedPreferencesService.getInstance().getPrefStringData("auth_token"));
+        final Call<StoreInfo> getMyStoreInfo = networkService.getMyStoreInfo(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN));
 
         getMyStoreInfo.enqueue(new Callback<StoreInfo>() {
             @Override
             public void onResponse(Call<StoreInfo> call, Response<StoreInfo> response) {
                 if(response.isSuccessful()){
-                    if(response.body().getStatus().equals("success")){
+                    if(response.body().getStatus().equals(NETWORK_SUCCESS)){
                         storeInfo = response.body();
                         networkAfter();
                         reviewBtn.setVisibility(View.GONE);
@@ -109,7 +122,7 @@ public class DetailActivity extends OrangeThemeActivity {
 
             @Override
             public void onFailure(Call<StoreInfo> call, Throwable t) {
-                Log.d("??", t.toString());
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
 
@@ -118,11 +131,12 @@ public class DetailActivity extends OrangeThemeActivity {
     private void getInitData() {
         Intent getData = getIntent();
         storeId = getData.getExtras().getInt("storeId");
+        openStatus = getData.getExtras().getFloat("openStatus");
         networkService = ApplicationController.getInstance().getNetworkService();
     }
 
     private void getStoreInfo() {
-        String token = SharedPreferencesService.getInstance().getPrefStringData("auth_token");
+        String token = SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN);
         if(token.equals(""))
             token = "nonLoginUser";
 
@@ -132,12 +146,12 @@ public class DetailActivity extends OrangeThemeActivity {
             @Override
             public void onResponse(Call<StoreInfo> call, Response<StoreInfo> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success")) {
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                         storeInfo = response.body();
                         networkAfter();
                         bookmarkFlag = storeInfo.getDetailInfo().getBasicInfo().getBookmarkCheck();
                         bookingCount.setText("대기인원 "+storeInfo.getDetailInfo().getBasicInfo().getReservationCount()+"명");
-                        if(storeInfo.getDetailInfo().getBasicInfo().getReservationCheck()==1){
+                        if(storeInfo.getDetailInfo().getBasicInfo().getReservationCheck()==EXIST_RESERVATION){
                             booking.setText("순번 대기중");
                         }
                     }
@@ -146,7 +160,7 @@ public class DetailActivity extends OrangeThemeActivity {
 
             @Override
             public void onFailure(Call<StoreInfo> call, Throwable t) {
-                Log.d(TAG, "error : " + t.toString());
+                LogUtil.d(getApplicationContext(), "error : " + t.toString());
             }
         });
 
@@ -156,7 +170,8 @@ public class DetailActivity extends OrangeThemeActivity {
         setToolbar();
         Gson gson = new Gson();
         String info = gson.toJson(storeInfo);
-        addFragment(NormalFragment.getInstance(), BundleBuilder.create().with("storeInfo", info).build());
+
+        replaceFragment(NormalFragment.getInstance(), BundleBuilder.create().with("storeInfo", info).build());
     }
 
     private void setToolbar() {
@@ -174,11 +189,11 @@ public class DetailActivity extends OrangeThemeActivity {
     }
 
 
-    public void addFragment(Fragment fragment, Bundle bundle) {
+    public void replaceFragment(Fragment fragment, @Nullable Bundle bundle){
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         fragment.setArguments(bundle);
-        transaction.add(R.id.detail_content, fragment);
+        transaction.replace(R.id.detail_content, fragment);
         transaction.commit();
     }
 
@@ -193,13 +208,18 @@ public class DetailActivity extends OrangeThemeActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-
         if (id == R.id.menu_detail_map) {
-            Intent mapIntent = new Intent(this, MapActivity.class);
-            mapIntent.putExtra("storeId", storeId);
-            startActivity(mapIntent);
+            if(openStatus != -1) {
+                Intent mapIntent = new Intent(this, MapActivity.class);
+                mapIntent.putExtra("storeId", storeId);
+                mapIntent.putExtra("reservationCheck", storeInfo.getDetailInfo().getBasicInfo().getReservationCheck());
+                startActivityForResult(mapIntent, CHECK_MAP);
+            }
+            else
+                ToastMaker.makeShortToast(getApplicationContext(), "오픈하지 않은 가게입니다.");
         } else if (id == R.id.menu_detail_bookmark_on || id == R.id.menu_detail_bookmark_off) {
-            if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST) {
+            if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) != RESULT_GUEST) {
+                ToastMaker.makeShortToast(getApplicationContext(), "로그인이 필요한 기능입니다.");
                 Intent needLogin = new Intent(this, LoginActivity.class);
                 startActivity(needLogin);
             } else {
@@ -210,7 +230,7 @@ public class DetailActivity extends OrangeThemeActivity {
             Gson gson = new Gson();
             String info = gson.toJson(storeInfo);
             editIntent.putExtra("info", info);
-            startActivity(editIntent);
+            startActivityForResult(editIntent, EDIT_COMPLETE);
         }
 
 
@@ -224,16 +244,16 @@ public class DetailActivity extends OrangeThemeActivity {
         MenuItem bookmarkOff = menu.findItem(R.id.menu_detail_bookmark_off);
         MenuItem edit = menu.findItem(R.id.menu_detail_edit);
 
-        if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") == RESULT_GUEST) {
+        if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) == RESULT_GUEST) {
             edit.setVisible(false);
-            if (bookmarkFlag == 0) {
+            if (bookmarkFlag == NON_EXIST_BOOKMARK) {
                 bookmarkOn.setVisible(false);
                 bookmarkOff.setVisible(true);
-            } else if (bookmarkFlag == 1) {
+            } else if (bookmarkFlag == EXIST_BOOKMARK) {
                 bookmarkOn.setVisible(true);
                 bookmarkOff.setVisible(false);
             }
-        } else if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") == RESULT_OWNER) {
+        } else if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) == RESULT_OWNER) {
             map.setVisible(false);
             bookmarkOff.setVisible(false);
             bookmarkOn.setVisible(false);
@@ -255,38 +275,53 @@ public class DetailActivity extends OrangeThemeActivity {
 
     @OnClick(R.id.booking)
     public void bookingClick(View view) {
-        if (SharedPreferencesService.getInstance().getPrefIntegerData("user_status") != RESULT_GUEST) {
+        if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) == RESULT_GUEST) {
+            if(openStatus != -1) {
+                if (storeInfo.getDetailInfo().getBasicInfo().getReservationCheck() == NON_EXIST_RESERVATION)
+                    reserve();
+                else
+                    ToastMaker.makeShortToast(getApplicationContext(), "      순번을 기다리고 있습니다!!\n 예약내역에서 취소가 가능합니다");
+            }
+            else
+                ToastMaker.makeShortToast(getApplicationContext(), "오픈하지 않은 가게입니다.");
+        }else if(SharedPreferencesService.getInstance().getPrefIntegerData("user_status") == RESULT_OWNER){
+            Intent reviewIntent = new Intent(this, ReviewActivity.class);
+            reviewIntent.putExtra("storeId", storeId);
+            startActivity(reviewIntent);
+        }
+        else {
+            ToastMaker.makeShortToast(getApplicationContext(), "로그인이 필요한 기능입니다.");
             Intent needLogin = new Intent(this, LoginActivity.class);
             startActivity(needLogin);
-        }else
-        reserve();
+        }
     }
 
     private void reserve() {
-        reserveDialog = new ReserveDialog(this, reserveYes);
-        reserveDialog.show();
+        baseDialog = new BaseDialog(this, reserveYes, "순번을 뽑으시겠습니까?");
+        baseDialog.show();
     }
 
     public View.OnClickListener reserveYes = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
+            Call<BaseModel> reserveCall = networkService.userReseve(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), storeId);
 
             reserveCall.enqueue(new Callback<BaseModel>() {
                 @Override
                 public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                     if (response.isSuccessful()) {
-                        if (response.body().getStatus().equals("success")) {
-                            ToastMaker.makeShortToast(getApplicationContext(), "성공");
+                        if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
                             booking.setText("순번 대기중");
-                            reserveDialog.dismiss();
+                            storeInfo.getDetailInfo().getBasicInfo().setReservationCheck(EXIST_RESERVATION);
+                            getStoreInfo();
+                            baseDialog.dismiss();
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                    LogUtil.d(getApplicationContext(), t.toString());
                 }
             });
         }
@@ -294,19 +329,18 @@ public class DetailActivity extends OrangeThemeActivity {
 
     private void bookmark() {
 
-        Call<BaseModel> bookmarkCall = networkService.userBookmark(SharedPreferencesService.getInstance().getPrefStringData("auth_token"), storeId);
+        Call<BaseModel> bookmarkCall = networkService.userBookmark(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN), storeId);
 
         bookmarkCall.enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus().equals("success")) {
-                        ToastMaker.makeShortToast(getApplicationContext(), "성공");
+                    if (response.body().getStatus().equals(NETWORK_SUCCESS)) {
 
-                        if (bookmarkFlag == 1)
-                            bookmarkFlag = 0;
+                        if (bookmarkFlag == EXIST_BOOKMARK)
+                            bookmarkFlag = NON_EXIST_BOOKMARK;
                         else
-                            bookmarkFlag = 1;
+                            bookmarkFlag = EXIST_BOOKMARK;
 
                         supportInvalidateOptionsMenu();
                     }
@@ -315,15 +349,20 @@ public class DetailActivity extends OrangeThemeActivity {
 
             @Override
             public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        getStoreInfo();
-//    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if(requestCode == EDIT_COMPLETE){
+                getMyStoreInfo();
+            }else if(requestCode == CHECK_MAP){
+                getStoreInfo();
+            }
+        }
+    }
 }

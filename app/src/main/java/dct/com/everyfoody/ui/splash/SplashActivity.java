@@ -13,12 +13,14 @@ import butterknife.ButterKnife;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.base.util.SharedPreferencesService;
 import dct.com.everyfoody.ui.home.owner.OwnerHomeActivity;
+import dct.com.everyfoody.ui.home.owner.nonauth.NonAuthOwnerActivity;
 import dct.com.everyfoody.ui.home.user.MainActivity;
 
-import static dct.com.everyfoody.ui.login.LoginActivity.EXPIRED_OWNER;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_GUEST;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NON_AUTH_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_NO_REG_STORE;
 import static dct.com.everyfoody.ui.login.LoginActivity.RESULT_OWNER;
+import static dct.com.everyfoody.ui.login.LoginActivity.USER_STATUS;
 
 public class SplashActivity extends AppCompatActivity {
     @BindView(R.id.truck_image)ImageView truckImage;
@@ -41,14 +43,14 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 finish();
-                switch (SharedPreferencesService.getInstance().getPrefIntegerData("user_status")){
-                    case RESULT_GUEST:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                switch (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS)){
+                    case RESULT_NON_AUTH_OWNER:case RESULT_NO_REG_STORE:
+                        startActivity(new Intent(getApplicationContext(), NonAuthOwnerActivity.class));
                         break;
-                    case RESULT_OWNER:case RESULT_NON_AUTH_OWNER:case EXPIRED_OWNER:
+                    case RESULT_OWNER:
                         startActivity(new Intent(getApplicationContext(), OwnerHomeActivity.class));
                         break;
-                    default:
+                    case RESULT_GUEST:default:
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         break;
                 }

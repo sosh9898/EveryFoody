@@ -12,9 +12,9 @@ public class OpenLocation {
     @SerializedName("opentruck_latitude")
     @Expose
     private double latitude;
-    @SerializedName("opentruck_longtitude")
+    @SerializedName("opentruck_longitude")
     @Expose
-    private double longtitude;
+    private double longitude;
 
     public double getLatitude() {
         return latitude;
@@ -24,11 +24,11 @@ public class OpenLocation {
         this.latitude = latitude;
     }
 
-    public double getLongtitude() {
-        return longtitude;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLongtitude(double longtitude) {
-        this.longtitude = longtitude;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

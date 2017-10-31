@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Everyfoody</string>
+    <string name="app_name">에브리푸디</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_main">MainActivity</string>
 
@@ -13,4 +13,6 @@
 
     <string name="facebook_app_id">1702239389847584</string>
     <string name="fb_login_protocol_scheme">fb1702239389847584</string>
+
+    <string name="network_success">success</string>
 </resources>

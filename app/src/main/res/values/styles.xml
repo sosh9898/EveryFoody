@@ -59,6 +59,23 @@
 
     <style name="WhiteTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="CustomShowcaseTheme3" parent="ShowcaseView.Light">
+        <item name="sv_backgroundColor">@color/colorEditMainImage</item>
+        <item name="sv_showcaseColor">@color/colorAccent</item>
+        <item name="sv_buttonText">다음</item>
+        <item name="sv_tintButtonColor">@color/colorAccent</item>
+        <item name="sv_titleTextAppearance">@style/CustomTitle</item>
+        <item name="sv_detailTextAppearance">@style/CustomText</item>
+    </style>
+
+    <style name="CustomTitle" parent="TextAppearance.ShowcaseView.Title.Light">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="CustomText" parent="TextAppearance.ShowcaseView.Detail.Light">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
 
 
 

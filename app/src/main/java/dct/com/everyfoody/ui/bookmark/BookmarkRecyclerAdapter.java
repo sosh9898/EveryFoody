@@ -24,7 +24,7 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
     private List<MainList.TruckList> bookmarkList;
     private View.OnClickListener onClickListener;
 
-    public void refreshAdapter(List<MainList.TruckList> bookmarkList){
+    public void refreshAdapter(List<MainList.TruckList> bookmarkList) {
         this.bookmarkList = bookmarkList;
         notifyDataSetChanged();
     }
@@ -43,7 +43,7 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((MainTruckListViewHolder)holder).bindView(bookmarkList.get(position));
+        ((MainTruckListViewHolder) holder).bindView(bookmarkList.get(position));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
     }
 
 
-    public class MainTruckListViewHolder extends RecyclerView.ViewHolder{
+    public class MainTruckListViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.main_list_item_image)
         ImageView mainListImage;
         @BindView(R.id.food_truck_name)
@@ -68,11 +68,16 @@ public class BookmarkRecyclerAdapter extends RecyclerView.Adapter {
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindView(MainList.TruckList truckList){
+        public void bindView(MainList.TruckList truckList) {
             Glide.with(mainListImage.getContext()).load(truckList.getStoreImage()).into(mainListImage);
             foodTruckName.setText(truckList.getStoreName());
-            foodTruckDistance.setText(truckList.getStoreDistance()+"");
-            foodTruckBookerCount.setText(truckList.getReservationCount()+"");
+            if (truckList.getStoreDistance() == -1) {
+                foodTruckDistance.setText("오픈하지 않음");
+                foodTruckBookerCount.setText("대기인원 0명");
+            } else {
+                foodTruckDistance.setText(truckList.getStoreDistance() + truckList.getStoreDistanceUnit());
+                foodTruckBookerCount.setText("대기인원 " + truckList.getReservationCount() + "명");
+            }
         }
     }
 }

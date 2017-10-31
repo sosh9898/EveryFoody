@@ -22,11 +22,20 @@ public class EditPagerAdapter extends FragmentStatePagerAdapter {
 
     public EditPagerAdapter(FragmentManager fm, StoreInfo storeInfo) {
         super(fm);
-        storeInfo = storeInfo;
+        this.storeInfo = storeInfo;
         Gson gson = new Gson();
         basic = gson.toJson(storeInfo.getDetailInfo().getBasicInfo());
         menu = gson.toJson(storeInfo);
 
+    }
+
+    public void refreshPageApater(StoreInfo storeInfo){
+        this.storeInfo = storeInfo;
+        this.notifyDataSetChanged();
+    }
+
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
     @Override

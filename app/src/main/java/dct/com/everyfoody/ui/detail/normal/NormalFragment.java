@@ -1,11 +1,14 @@
 package dct.com.everyfoody.ui.detail.normal;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.model.StoreInfo;
 
@@ -79,6 +83,30 @@ public class NormalFragment extends Fragment {
         storeInfo = gson.fromJson(infoJson, StoreInfo.class);
         menuInfoList = new ArrayList<>();
         menuInfoList = storeInfo.getDetailInfo().getMenuInfo();
+    }
+
+    @OnClick(R.id.facebook_link)
+    public void onClickFacebook(View view){
+        if(!TextUtils.isEmpty(storeInfo.getDetailInfo().getBasicInfo().getStoreFacebookURL())) {
+            Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(storeInfo.getDetailInfo().getBasicInfo().getStoreFacebookURL()));
+            startActivity(facebookIntent);
+        }
+    }
+
+    @OnClick(R.id.twitter_link)
+    public void onClickTwitter(View view){
+        if(!TextUtils.isEmpty(storeInfo.getDetailInfo().getBasicInfo().getStoreTwitterURL())) {
+            Intent twitterIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(storeInfo.getDetailInfo().getBasicInfo().getStoreTwitterURL()));
+            startActivity(twitterIntent);
+        }
+    }
+
+    @OnClick(R.id.instagram_link)
+    public void onClickInstagram(View view){
+        if(!TextUtils.isEmpty(storeInfo.getDetailInfo().getBasicInfo().getStoreInstagramURL())) {
+            Intent instagramIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(storeInfo.getDetailInfo().getBasicInfo().getStoreInstagramURL()));
+            startActivity(instagramIntent);
+        }
     }
 
 }
