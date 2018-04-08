@@ -181,14 +181,14 @@ public class MapActivity extends WhiteThemeActivity implements OnMapReadyCallbac
         LatLng position = new LatLng(mLatitude, mLongitude);
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
-
+/*FIXME
         myLocation = map.addMarker(new MarkerOptions()
                 .position(position)
                 .title("내 위치")
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.me)));
 
-
+*/
         if (userStatus == RESULT_OWNER) {
             map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
                 @Override

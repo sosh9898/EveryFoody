@@ -13,6 +13,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dct.com.everyfoody.R;
 import dct.com.everyfoody.model.MainList;
 
@@ -81,6 +82,9 @@ public class TruckRecyclerAdapter extends RecyclerView.Adapter {
             }
         }
 
-
+        @OnClick(R.id.food_truck_name)
+        public void onClick(View view){
+            //클릭 이벤트
+        }
     }
 }

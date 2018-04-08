@@ -50,7 +50,6 @@ import retrofit2.Response;
 import static android.R.attr.maxHeight;
 import static android.R.attr.maxWidth;
 import static android.app.Activity.RESULT_OK;
-import static com.facebook.FacebookSdk.getCacheDir;
 import static dct.com.everyfoody.ui.login.LoginActivity.AUTH_TOKEN;
 import static dct.com.everyfoody.ui.login.LoginActivity.NETWORK_SUCCESS;
 
@@ -223,7 +222,7 @@ public class NormalEditFragment extends Fragment {
         options.setToolbarTitle("사진 편집");
         options.setStatusBarColor(getResources().getColor(R.color.colorAccent));
 
-        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), uri.toString().substring(uri.toString().lastIndexOf('/') + 1)));
+        Uri mDestinationUri = Uri.fromFile(new File(getContext().getCacheDir(), uri.toString().substring(uri.toString().lastIndexOf('/') + 1)));
 
 
         UCrop.of(uri, mDestinationUri)
@@ -258,7 +257,7 @@ public class NormalEditFragment extends Fragment {
         options.setToolbarTitle("사진 편집");
         options.setStatusBarColor(getResources().getColor(R.color.colorAccent));
 
-        Uri mDestinationUri = Uri.fromFile(new File(getCacheDir(), "thumbnail" + tempUri.toString().substring(tempUri.toString().lastIndexOf('/') + 1)));
+        Uri mDestinationUri = Uri.fromFile(new File(getContext().getCacheDir(), "thumbnail" + tempUri.toString().substring(tempUri.toString().lastIndexOf('/') + 1)));
 
 
         UCrop.of(tempUri, mDestinationUri)

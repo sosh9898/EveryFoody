@@ -36,12 +36,13 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:layout_marginTop="60dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
         android:background="@color/colorAccent"
         android:gravity="center_horizontal"
         android:orientation="vertical">
+
 
         <com.kakao.usermgmt.LoginButton
             android:visibility="gone"
@@ -67,6 +68,7 @@
             android:background="@drawable/kakao_button"
             android:text="페이스북 로그인"
             android:textColor="@color/colorAccentText" />
+
 
     </LinearLayout>
 

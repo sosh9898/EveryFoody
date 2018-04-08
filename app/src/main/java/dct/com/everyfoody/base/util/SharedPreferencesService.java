@@ -119,6 +119,7 @@ public class SharedPreferencesService {
     public void setPrefDatas(Map<String, Object> values) {
         SharedPreferences.Editor editor = pref.edit();
 
+
         Iterator<String> keyLists = values.keySet().iterator();
 
         while (keyLists.hasNext()) {

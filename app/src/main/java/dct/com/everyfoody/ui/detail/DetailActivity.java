@@ -258,7 +258,6 @@ public class DetailActivity extends OrangeThemeActivity {
             bookmarkOff.setVisible(false);
             bookmarkOn.setVisible(false);
         } else {
-
             bookmarkOn.setVisible(false);
             edit.setVisible(false);
         }

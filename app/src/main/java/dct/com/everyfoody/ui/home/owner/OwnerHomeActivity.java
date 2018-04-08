@@ -171,7 +171,7 @@ public class OwnerHomeActivity extends WhiteThemeActivity {
                 .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
                     @Override
                     public void onImageSelected(Uri uri) {
-                        modifyProfileImage(uri);
+
                     }
                 })
                 .create();

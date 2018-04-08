@@ -13,6 +13,8 @@ import dct.com.everyfoody.base.BaseModel;
 
 public class Menu extends BaseModel {
 
+
+
     @SerializedName("data")
     @Expose
     private MenuItem menuItem;

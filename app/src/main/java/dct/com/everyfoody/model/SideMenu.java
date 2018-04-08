@@ -119,7 +119,4 @@ public class SideMenu extends BaseModel {
             this.toggle = toggle;
         }
     }
-
-
-
 }

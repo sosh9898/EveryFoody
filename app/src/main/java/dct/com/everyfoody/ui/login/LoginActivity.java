@@ -58,7 +58,7 @@ public class LoginActivity extends WhiteThemeActivity {
     public final static String USER_STATUS = "user_status";
     public final static String USER_NAME = "user_name";
     public final static String DIVICE_TOKEN = "fcm_token";
-    public final static     int RESULT_GUEST = 401;     //value값1
+    public final static int RESULT_GUEST = 401;     //value값1
     public final static int RESULT_OWNER = 402;     //value값2
     public final static int RESULT_NON_AUTH_OWNER = 403;  // 인증 대기 사업자
     public final static int RESULT_NO_REG_STORE = 404;          // 미인증 사업자
@@ -334,5 +334,36 @@ public class LoginActivity extends WhiteThemeActivity {
             startActivity(intent);
             finish();
         }
+    }
+
+    private void testLogin(String email, int category) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setEmail(email);
+        userInfo.setUid(String.valueOf(111));
+        userInfo.setCategory(category);
+        userInfo.setDeviceToken(SharedPreferencesService.getInstance().getPrefStringData("fcm_token"));
+
+        Call<Login> loginCall = networkService.userLogin(userInfo);
+
+        loginCall.enqueue(new Callback<Login>() {
+            @Override
+            public void onResponse(Call<Login> call, Response<Login> response) {
+                if (response.isSuccessful()) {
+                    SharedPreferencesService.getInstance().setPrefData(AUTH_TOKEN, response.body().getResultData().getToken());
+                    SharedPreferencesService.getInstance().setPrefData(USER_NAME, response.body().getResultData().getName());
+                    int userStatus = response.body().getResultData().getCategory();
+                    Intent loginResult = new Intent();
+                    SharedPreferencesService.getInstance().setPrefData(USER_STATUS, userStatus);
+                    loginResult.putExtra(LOGIN_RESULT, userStatus);
+                    setResult(RESULT_OK, loginResult);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Login> call, Throwable t) {
+                LogUtil.d(getApplicationContext(), t.toString());
+            }
+        });
     }
 }

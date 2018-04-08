@@ -55,4 +55,4 @@ freeline/
 freeline_project_description.json
 
 # Security Data
-app/src/main/java/dct/com/everyfoody/ui/global/security/SecurityDataSet.java
+app/src/main/res/values/

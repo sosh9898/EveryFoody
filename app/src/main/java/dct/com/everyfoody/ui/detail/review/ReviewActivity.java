@@ -73,7 +73,8 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
     LinearLayout commentItem;
     @BindView(R.id.warning_layout)
     View warningLayout;
-    @BindView(R.id.review_srl)SwipeRefreshLayout reviewRefreshLayout;
+    @BindView(R.id.review_srl)
+    SwipeRefreshLayout reviewRefreshLayout;
 
     private ReviewRecyclerAdapter reviewRecyclerAdapter;
     private NetworkService networkService;
@@ -94,6 +95,9 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
         reviewList = new ArrayList<>();
         Intent getId = getIntent();
         tempId = getId.getExtras().getInt("storeId");
+
+
+        SharedPreferencesService.getInstance().load(this);
 
         checkUserStatus();
         setToolbar();
@@ -130,7 +134,7 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
         reviewRefreshLayout.setOnRefreshListener(this);
     }
 
-    private void ifemptyData() {
+    private void ifemptyData(){
         nonDataWarning = new BookmarkActivity.NonDataWarning();
         ButterKnife.bind(nonDataWarning, warningLayout);
         reviewRecycler.setVisibility(View.INVISIBLE);
@@ -138,13 +142,13 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
         nonDataWarning.warningText.setText("등록된 후기가 없습니다.");
     }
 
-    private void checkUserStatus() {
+    private void checkUserStatus(){
         if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) == RESULT_OWNER)
             commentItem.setVisibility(View.GONE);
 
     }
 
-    private void getReviewList() {
+    private void getReviewList(){
         String token = SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN);
         if (token.equals(""))
             token = "nonLoginUser";
@@ -176,13 +180,13 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
         });
     }
 
-    private void setRecycler() {
+    private void setRecycler(){
         reviewRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         reviewRecyclerAdapter = new ReviewRecyclerAdapter(reviewList);
         reviewRecycler.setAdapter(reviewRecyclerAdapter);
     }
 
-    private void setToolbar() {
+    private void setToolbar(){
         reviewToolbar.setTitle("");
         setSupportActionBar(reviewToolbar);
         reviewToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back));
@@ -194,7 +198,7 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
         });
     }
 
-    private void checkPermission() {
+    private void checkPermission(){
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -213,7 +217,7 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
                 .check();
     }
 
-    private void registerReview() {
+    private void registerReview(){
         RequestBody storeId = RequestBody.create(MediaType.parse("multipart/form-data"), tempId + "");
         RequestBody content = RequestBody.create(MediaType.parse("multipart/form-data"), commentEdit.getText().toString());
         RequestBody score = RequestBody.create(MediaType.parse("multipart/form-data"), rating);
@@ -261,14 +265,14 @@ public class ReviewActivity extends WhiteThemeActivity implements SwipeRefreshLa
             }
 
             @Override
-            public void onFailure(Call<BaseModel> call, Throwable t) {
+            public void onFailure(Call<BaseModel> call, Throwable t){
                 LogUtil.d(getApplicationContext(), t.toString());
             }
         });
     }
 
     @OnClick(R.id.comment_register_btn)
-    public void onClickRegisterReview(View view) {
+    public void onClickRegisterReview(View view){
         if (SharedPreferencesService.getInstance().getPrefIntegerData(USER_STATUS) != RESULT_GUEST) {
             ToastMaker.makeShortToast(getApplicationContext(), "로그인이 필요한 기능입니다.");
             Intent needLogin = new Intent(this, LoginActivity.class);

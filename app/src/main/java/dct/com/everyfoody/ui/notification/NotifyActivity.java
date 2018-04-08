@@ -71,7 +71,7 @@ public class NotifyActivity extends WhiteThemeActivity implements SwipeRefreshLa
     }
 
     private void getNotiList() {
-        Call<Notification> notificationCall = networkService.getNotiList(SharedPreferencesService.getInstance().getPrefStringData(AUTH_TOKEN));
+        final Call<Notification> notificationCall = networkService.getNotiList(AUTH_TOKEN);
 
         notificationCall.enqueue(new Callback<Notification>() {
             @Override
@@ -81,12 +81,12 @@ public class NotifyActivity extends WhiteThemeActivity implements SwipeRefreshLa
                         notiList = response.body().getNotiList();
                         notiRecyclerAdapter.refreshAdapter(notiList);
 
-                        if (notiList.size() == 0)
-                            ifemptyData();
-                        else {
-                            notiRecycler.setVisibility(View.VISIBLE);
-                            warningLayout.setVisibility(View.INVISIBLE);
-                        }
+//                        if (notiList.size() == 0)
+//                            ifemptyData();
+//                        else {
+//                            notiRecycler.setVisibility(View.VISIBLE);
+//                            warningLayout.setVisibility(View.INVISIBLE);
+//                        }
                     }
                 }
             }
