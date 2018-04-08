@@ -1,5 +1,7 @@
-# Android2
-# EveryFoody
-# EveryFoody
-# EveryFoody
-# EveryFoody
+# Every Foody
+
+## 서울시 앱 공모전 프로젝트
+
+사용자 모드와 사업자 모드로 나뉘어 이용되는 서비스로 
+
+지역별 푸드트럭 정보와 실시간 푸드트럭 순번 예약이 주 목적인 서비스
