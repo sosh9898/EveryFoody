@@ -22,7 +22,7 @@
 
 ## # MapClipDataHelper 클래스
 
-![image](./image/image.png)
+![image](./image/home.png)
 
 위 이미지는 EveryFoody 일반 사용자 메인 화면입니다.
 
